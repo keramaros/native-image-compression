@@ -14,3 +14,21 @@
 .mosc-log-entry { margin-bottom: 4px; border-bottom: 1px solid #3c434a; padding-bottom: 2px; }
 .mosc-log-entry.success { color: #7ad03a; }
 .mosc-log-entry.info { color: #72aee6; }
+
+#mosc-progress-table-container table {
+    margin-top: 10px;
+}
+
+#mosc-progress-log tr.error {
+    background-color: #fcf0f1;
+}
+
+#mosc-progress-log td {
+    vertical-align: middle;
+}
+
+#mosc-progress-log .status .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}

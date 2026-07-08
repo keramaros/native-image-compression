@@ -48,5 +48,22 @@ if ( ! defined( 'ABSPATH' ) ) {
             <button id="mosc-stop" class="button button-secondary" disabled style="display: none;"><?php _e( 'Stop', 'media-optimizer-stats' ); ?></button>
             <span class="mosc-spinner spinner"></span>
         </div>
+
+        <div id="mosc-progress-table-container" style="display: none; margin-top: 20px;">
+            <table class="wp-list-table widefat fixed striped">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;"><?php _e( 'Thumb', 'media-optimizer-stats' ); ?></th>
+                        <th><?php _e( 'File', 'media-optimizer-stats' ); ?></th>
+                        <th><?php _e( 'Original Size', 'media-optimizer-stats' ); ?></th>
+                        <th><?php _e( 'Optimized Size', 'media-optimizer-stats' ); ?></th>
+                        <th><?php _e( 'Savings', 'media-optimizer-stats' ); ?></th>
+                        <th style="width: 100px;"><?php _e( 'Status', 'media-optimizer-stats' ); ?></th>
+                    </tr>
+                </thead>
+                <tbody id="mosc-progress-log">
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

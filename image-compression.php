@@ -20,6 +20,7 @@ class Media_Compression_Stats
     {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_assets'));
+        add_action('wp_ajax_mosc_get_next_image', array($this, 'ajax_get_next_image'));
         add_action('wp_ajax_mosc_process_image', array($this, 'ajax_process_image'));
     }
 
@@ -177,7 +178,50 @@ class Media_Compression_Stats
     }
 
     /**
-     * AJAX Handler: Process next image
+     * AJAX Handler: Get next image data without processing
+     */
+    public function ajax_get_next_image()
+    {
+        check_ajax_referer('mosc_nonce', 'nonce');
+
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+
+        global $wpdb;
+        $results = $wpdb->get_results("
+			SELECT p.ID 
+			FROM $wpdb->posts p 
+			LEFT JOIN $wpdb->postmeta pm ON p.ID = pm.post_id AND pm.meta_key = '_is_compressed' 
+			WHERE p.post_type = 'attachment' 
+			AND p.post_mime_type LIKE 'image/%' 
+			AND (pm.meta_value IS NULL OR pm.meta_value = '0')
+			ORDER BY p.ID ASC
+			LIMIT 1
+		");
+
+        if (empty($results)) {
+            wp_send_json_success(array('finished' => true));
+        }
+
+        $attachment_id = $results[0]->ID;
+        $original_size = $this->get_attachment_total_size($attachment_id);
+        $thumb_url = wp_get_attachment_image_url($attachment_id, 'thumbnail');
+        $filename = basename(get_attached_file($attachment_id));
+
+        wp_send_json_success(array(
+            'image' => array(
+                'id' => $attachment_id,
+                'filename' => $filename,
+                'thumb' => $thumb_url,
+                'original_size' => is_wp_error($original_size) ? 'Error' : size_format($original_size),
+            ),
+            'finished' => false
+        ));
+    }
+
+    /**
+     * AJAX Handler: Process specific image
      */
     public function ajax_process_image()
     {
@@ -187,24 +231,10 @@ class Media_Compression_Stats
             wp_send_json_error('Unauthorized');
         }
 
-        global $wpdb;
-        // Find next uncompressed image
-        $results = $wpdb->get_results("
-			SELECT p.ID 
-			FROM $wpdb->posts p 
-			LEFT JOIN $wpdb->postmeta pm ON p.ID = pm.post_id AND pm.meta_key = '_is_compressed' 
-			WHERE p.post_type = 'attachment' 
-			AND p.post_mime_type LIKE 'image/%' 
-			AND (pm.meta_value IS NULL OR pm.meta_value = '0')
-			ORDER BY p.ID ASC
-			LIMIT 2
-		");
-
-        if (empty($results)) {
-            wp_send_json_success(array('finished' => true));
+        $attachment_id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+        if (!$attachment_id) {
+            wp_send_json_error('Invalid ID');
         }
-
-        $attachment_id = $results[0]->ID;
 
         // 1. Save original size
         $original_size = $this->get_attachment_total_size($attachment_id);
@@ -240,7 +270,12 @@ class Media_Compression_Stats
 
         wp_send_json_success(array(
             'stats' => $this->get_stats(),
-            'finished' => false
+            'image' => array(
+                'id' => $attachment_id,
+                'optimized_size' => size_format($optimized_size),
+                'saved_percent' => $original_size > 0 ? round((($original_size - $optimized_size) / $original_size) * 100, 2) : 0,
+                'error' => $error
+            )
         ));
     }
 
