@@ -4,6 +4,7 @@
  * Description: Adds a media compression dashboard with statistics, a progress bar, and asynchronous AJAX compression.
  * Version: 1.0.0
  * Author: Keramaros Antonios
+ * Author URI: https://keramaros.gr
  */
 
 if (!defined('ABSPATH')) {
