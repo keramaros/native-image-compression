@@ -20,8 +20,8 @@ class Media_Compression_Stats
     {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_assets'));
-        add_action('wp_ajax_mosc_get_next_image', array($this, 'ajax_get_next_image'));
-        add_action('wp_ajax_mosc_process_image', array($this, 'ajax_process_image'));
+        add_action('wp_ajax_kaic_get_next_image', array($this, 'ajax_get_next_image'));
+        add_action('wp_ajax_kaic_process_image', array($this, 'ajax_process_image'));
     }
 
     /**
@@ -47,11 +47,11 @@ class Media_Compression_Stats
             return;
         }
 
-        wp_enqueue_style('mosc-admin-css', plugin_dir_url(__FILE__) . 'assets/css/admin.css', array(), '1.0.0');
-        wp_enqueue_script('mosc-admin-js', plugin_dir_url(__FILE__) . 'assets/js/admin.js', array('jquery'), '1.0.0', true);
+        wp_enqueue_style('kaic-admin-css', plugin_dir_url(__FILE__) . 'assets/css/admin.css', array(), '1.0.0');
+        wp_enqueue_script('kaic-admin-js', plugin_dir_url(__FILE__) . 'assets/js/admin.js', array('jquery'), '1.0.0', true);
 
-        wp_localize_script('mosc-admin-js', 'mosc_vars', array(
-            'nonce' => wp_create_nonce('mosc_nonce')
+        wp_localize_script('kaic-admin-js', 'kaic_vars', array(
+            'nonce' => wp_create_nonce('kaic_nonce')
         ));
     }
 
@@ -75,10 +75,10 @@ class Media_Compression_Stats
         $total_attachments = (int)$wpdb->get_var("SELECT COUNT(ID) FROM $wpdb->posts WHERE post_type = 'attachment' AND post_mime_type LIKE 'image/%'");
 
         // Processed count
-        $processed_count = (int)$wpdb->get_var("SELECT COUNT(post_id) FROM $wpdb->postmeta WHERE meta_key = '_is_compressed' AND meta_value = '1'");
+        $processed_count = (int)$wpdb->get_var("SELECT COUNT(post_id) FROM $wpdb->postmeta WHERE meta_key = '_kaic_is_compressed' AND meta_value = '1'");
 
         // Original size sum
-        $original_size = (float)$wpdb->get_var("SELECT SUM(meta_value) FROM $wpdb->postmeta WHERE meta_key = '_original_file_size'");
+        $original_size = (float)$wpdb->get_var("SELECT SUM(meta_value) FROM $wpdb->postmeta WHERE meta_key = '_kaic_original_file_size'");
 
         // For images not yet processed, we should count their current size as original for the stats?
         // Actually, the requirement says \"Total original size of all images combined\".
@@ -96,9 +96,9 @@ class Media_Compression_Stats
         ));
 
         foreach ($attachments as $id) {
-            $is_compressed = get_post_meta($id, '_is_compressed', true);
-            $orig = (float)get_post_meta($id, '_original_file_size', true);
-            $opt = (float)get_post_meta($id, '_optimized_file_size', true);
+            $is_compressed = get_post_meta($id, '_kaic_is_compressed', true);
+            $orig = (float)get_post_meta($id, '_kaic_original_file_size', true);
+            $opt = (float)get_post_meta($id, '_kaic_optimized_file_size', true);
 
             $meta = wp_get_attachment_metadata($id);
             $count = 1; // Main file
@@ -182,7 +182,7 @@ class Media_Compression_Stats
      */
     public function ajax_get_next_image()
     {
-        check_ajax_referer('mosc_nonce', 'nonce');
+        check_ajax_referer('kaic_nonce', 'nonce');
 
         if (!current_user_can('manage_options')) {
             wp_send_json_error('Unauthorized');
@@ -192,7 +192,7 @@ class Media_Compression_Stats
         $results = $wpdb->get_results("
 			SELECT p.ID 
 			FROM $wpdb->posts p 
-			LEFT JOIN $wpdb->postmeta pm ON p.ID = pm.post_id AND pm.meta_key = '_is_compressed' 
+			LEFT JOIN $wpdb->postmeta pm ON p.ID = pm.post_id AND pm.meta_key = '_kaic_is_compressed' 
 			WHERE p.post_type = 'attachment' 
 			AND p.post_mime_type LIKE 'image/%' 
 			AND (pm.meta_value IS NULL OR pm.meta_value = '0')
@@ -225,7 +225,7 @@ class Media_Compression_Stats
      */
     public function ajax_process_image()
     {
-        check_ajax_referer('mosc_nonce', 'nonce');
+        check_ajax_referer('kaic_nonce', 'nonce');
 
         if (!current_user_can('manage_options')) {
             wp_send_json_error('Unauthorized');
@@ -243,7 +243,7 @@ class Media_Compression_Stats
         if (is_wp_error($original_size)) {
             $error = $original_size->get_error_message();
         } else {
-            update_post_meta($attachment_id, '_original_file_size', (int)$original_size);
+            update_post_meta($attachment_id, '_kaic_original_file_size', (int)$original_size);
 
             // 2. Simulate Compression
             $result = $this->simulate_media_compression($attachment_id);
@@ -255,15 +255,15 @@ class Media_Compression_Stats
                 if (is_wp_error($optimized_size)) {
                     $error = $optimized_size->get_error_message();
                 } else {
-                    update_post_meta($attachment_id, '_optimized_file_size', (int)$optimized_size);
+                    update_post_meta($attachment_id, '_kaic_optimized_file_size', (int)$optimized_size);
                 }
             }
         }
 
         // Always mark as compressed (or failed) to prevent infinite loops
-        update_post_meta($attachment_id, '_is_compressed', '1');
+        update_post_meta($attachment_id, '_kaic_is_compressed', '1');
         if ($error) {
-            update_post_meta($attachment_id, '_compression_error', $error);
+            update_post_meta($attachment_id, '_kaic_compression_error', $error);
         }
 
         $optimized_size = isset($optimized_size) && !is_wp_error($optimized_size) ? $optimized_size : $original_size;

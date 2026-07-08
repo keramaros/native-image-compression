@@ -1,21 +1,21 @@
 jQuery(document).ready(function($) {
     let isProcessing = false;
-    const nonce = mosc_vars.nonce;
+    const nonce = kaic_vars.nonce;
 
     function updateStats(stats) {
-        $('#mosc-total-attachments').text(stats.total_attachments);
-        $('#mosc-total-files').text(stats.total_files);
-        $('#mosc-original-size').text(stats.original_size_formatted);
-        $('#mosc-optimized-size').text(stats.optimized_size_formatted);
-        $('#mosc-total-saved-percent').text(stats.total_saved_percent + '%');
+        $('#kaic-total-attachments').text(stats.total_attachments);
+        $('#kaic-total-files').text(stats.total_files);
+        $('#kaic-original-size').text(stats.original_size_formatted);
+        $('#kaic-optimized-size').text(stats.optimized_size_formatted);
+        $('#kaic-total-saved-percent').text(stats.total_saved_percent + '%');
         
         const percent = stats.total_attachments > 0 ? Math.round((stats.processed_count / stats.total_attachments) * 100) : 0;
-        $('.mosc-progress-bar-fill').css('width', percent + '%');
-        $('.mosc-progress-text').text(percent + '% (' + stats.processed_count + ' / ' + stats.total_attachments + ' Images Compressed)');
+        $('.kaic-progress-bar-fill').css('width', percent + '%');
+        $('.kaic-progress-text').text(percent + '% (' + stats.processed_count + ' / ' + stats.total_attachments + ' Images Compressed)');
     }
 
     function addRow(imageData) {
-        const row = $('<tr id="mosc-row-' + imageData.id + '">' +
+        const row = $('<tr id="kaic-row-' + imageData.id + '">' +
             '<td><img src="' + imageData.thumb + '" style="width: 50px; height: auto;"></td>' +
             '<td>' + imageData.filename + '</td>' +
             '<td>' + imageData.original_size + '</td>' +
@@ -23,11 +23,11 @@ jQuery(document).ready(function($) {
             '<td class="savings">-</td>' +
             '<td class="status"><span class="spinner is-active" style="float: none; visibility: visible; margin: 0;"></span></td>' +
             '</tr>');
-        $('#mosc-progress-log').append(row);
+        $('#kaic-progress-log').append(row);
     }
 
     function updateRow(imageData) {
-        const $row = $('#mosc-row-' + imageData.id);
+        const $row = $('#kaic-row-' + imageData.id);
         if (imageData.error) {
             $row.addClass('error');
             $row.find('.status').html('<span class="dashicons dashicons-warning" style="color: #d63638;"></span> ' + imageData.error);
@@ -48,7 +48,7 @@ jQuery(document).ready(function($) {
             url: ajaxurl,
             type: 'POST',
             data: {
-                action: 'mosc_get_next_image',
+                action: 'kaic_get_next_image',
                 nonce: nonce
             },
             success: function(response) {
@@ -67,7 +67,7 @@ jQuery(document).ready(function($) {
                             url: ajaxurl,
                             type: 'POST',
                             data: {
-                                action: 'mosc_process_image',
+                                action: 'kaic_process_image',
                                 id: image.id,
                                 nonce: nonce
                             },
@@ -117,21 +117,21 @@ jQuery(document).ready(function($) {
 
     function startProcessing() {
         isProcessing = true;
-        $('#mosc-start').prop('disabled', true);
-        $('#mosc-stop').prop('disabled', false).show();
-        $('.mosc-spinner').addClass('is-active');
-        $('.mosc-progress-text, .mosc-progress-bar-container, #mosc-progress-table-container').show();
+        $('#kaic-start').prop('disabled', true);
+        $('#kaic-stop').prop('disabled', false).show();
+        $('.kaic-spinner').addClass('is-active');
+        $('.kaic-progress-text, .kaic-progress-bar-container, #kaic-progress-table-container').show();
 
         processNext();
     }
 
     function stopProcessing() {
         isProcessing = false;
-        $('#mosc-start').prop('disabled', false);
-        $('#mosc-stop').prop('disabled', true);
-        $('.mosc-spinner').removeClass('is-active');
+        $('#kaic-start').prop('disabled', false);
+        $('#kaic-stop').prop('disabled', true);
+        $('.kaic-spinner').removeClass('is-active');
     }
 
-    $('#mosc-start').on('click', startProcessing);
-    $('#mosc-stop').on('click', stopProcessing);
+    $('#kaic-start').on('click', startProcessing);
+    $('#kaic-stop').on('click', stopProcessing);
 });
