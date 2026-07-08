@@ -1,0 +1,16 @@
+.mosc-dashboard { margin: 20px 20px 0 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; }
+.mosc-stats-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+.mosc-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e5e5; }
+.mosc-card h3 { margin: 0 0 10px 0; font-size: 14px; color: #646970; text-transform: uppercase; letter-spacing: 0.05em; }
+.mosc-card .value { font-size: 24px; font-weight: 600; color: #1d2327; }
+.mosc-progress-section { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e5e5; margin-bottom: 30px; }
+.mosc-progress-bar-container { background: #f0f0f1; height: 24px; border-radius: 12px; overflow: hidden; margin: 20px 0; border: 1px solid #dcdcde; }
+.mosc-progress-bar-fill { background: #2271b1; height: 100%; width: 0%; transition: width 0.3s ease; }
+.mosc-progress-text { text-align: center; font-weight: 500; margin-bottom: 10px; }
+.mosc-controls { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
+.mosc-spinner.spinner { float: none; visibility: hidden; margin: 0; }
+.mosc-spinner.spinner.is-active { visibility: visible; }
+.mosc-log-container { background: #1d2327; color: #f0f0f1; padding: 15px; border-radius: 4px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 13px; line-height: 1.5; }
+.mosc-log-entry { margin-bottom: 4px; border-bottom: 1px solid #3c434a; padding-bottom: 2px; }
+.mosc-log-entry.success { color: #7ad03a; }
+.mosc-log-entry.info { color: #72aee6; }
