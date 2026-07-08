@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             <p><?php _e( 'Statistics based on all available JPEG, PNG, and WebP images in your media library.', 'media-optimizer-stats' ); ?></p>
             
             <div class="kaic-savings-container">
-                <div class="kaic-savings-circle">
+                <div class="kaic-savings-circle" style="--percentage: <?php echo esc_attr( $stats['total_saved_percent'] ); ?>;">
                     <div class="inner">
                         <span id="kaic-total-saved-percent"><?php echo esc_html( $stats['total_saved_percent'] ); ?>%</span>
                         <span class="subtext"><?php _e( 'savings', 'media-optimizer-stats' ); ?></span>

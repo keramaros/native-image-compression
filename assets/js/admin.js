@@ -9,6 +9,7 @@ jQuery(document).ready(function($) {
         $('#kaic-original-size').text(stats.original_size_formatted);
         $('#kaic-optimized-size').text(stats.optimized_size_formatted);
         $('#kaic-total-saved-percent').text(stats.total_saved_percent + '%');
+        $('.kaic-savings-circle').css('--percentage', stats.total_saved_percent);
     }
 
     function addRow(imageData) {

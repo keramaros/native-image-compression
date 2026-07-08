@@ -13,8 +13,25 @@
 .remember-label { font-weight: 600; color: #2c3338; }
 
 .kaic-savings-container { display: flex; align-items: center; gap: 40px; margin-top: 20px; }
-.kaic-savings-circle { width: 120px; height: 120px; border-radius: 50%; border: 8px solid #f0f0f1; display: flex; align-items: center; justify-content: center; position: relative; }
-.kaic-savings-circle .inner { display: flex; flex-direction: column; align-items: center; }
+.kaic-savings-circle { 
+    width: 120px; 
+    height: 120px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    position: relative;
+    background: conic-gradient(#2271b1 calc(var(--percentage) * 1%), #f0f0f1 0);
+}
+.kaic-savings-circle::before {
+    content: "";
+    position: absolute;
+    width: 104px;
+    height: 104px;
+    background: #fff;
+    border-radius: 50%;
+}
+.kaic-savings-circle .inner { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
 .kaic-savings-circle #kaic-total-saved-percent { font-size: 28px; font-weight: 700; color: #2271b1; }
 .kaic-savings-circle .subtext { font-size: 14px; color: #2271b1; }
 
