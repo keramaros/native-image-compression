@@ -1,18 +1,18 @@
 jQuery(document).ready(function($) {
     let isProcessing = false;
-    const nonce = akic_vars.nonce;
+    const nonce = kaic_vars.nonce;
 
     function updateStats(stats) {
-        $('#akic-total-attachments').text(stats.total_attachments);
-        $('#akic-total-files').text(stats.total_files);
-        $('#akic-processed-count').text(stats.processed_count);
-        $('#akic-original-size').text(stats.original_size_formatted);
-        $('#akic-optimized-size').text(stats.optimized_size_formatted);
-        $('#akic-total-saved-percent').text(stats.total_saved_percent + '%');
+        $('#kaic-total-attachments').text(stats.total_attachments);
+        $('#kaic-total-files').text(stats.total_files);
+        $('#kaic-processed-count').text(stats.processed_count);
+        $('#kaic-original-size').text(stats.original_size_formatted);
+        $('#kaic-optimized-size').text(stats.optimized_size_formatted);
+        $('#kaic-total-saved-percent').text(stats.total_saved_percent + '%');
     }
 
     function addRow(imageData) {
-        const row = $('<tr id="akic-row-' + imageData.id + '">' +
+        const row = $('<tr id="kaic-row-' + imageData.id + '">' +
             '<td class="column-file">' +
                 '<div style="display: flex; align-items: center; gap: 10px;">' +
                     '<img src="' + imageData.thumb + '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">' +
@@ -24,11 +24,11 @@ jQuery(document).ready(function($) {
             '<td class="column-savings">-</td>' +
             '<td class="column-status"><span class="spinner is-active" style="float: none; visibility: visible; margin: 0;"></span></td>' +
             '</tr>');
-        $('#akic-progress-log').append(row);
+        $('#kaic-progress-log').append(row);
     }
 
     function updateRow(imageData) {
-        const $row = $('#akic-row-' + imageData.id);
+        const $row = $('#kaic-row-' + imageData.id);
         if (imageData.error) {
             $row.addClass('error');
             $row.find('.column-status').html('<span class="dashicons dashicons-warning" style="color: #d63638;"></span> ' + imageData.error);
@@ -118,20 +118,20 @@ jQuery(document).ready(function($) {
 
     function startProcessing() {
         isProcessing = true;
-        $('#akic-start').prop('disabled', true);
-        $('#akic-stop').prop('disabled', false).show();
-        $('.akic-spinner').addClass('is-active');
+        $('#kaic-start').prop('disabled', true);
+        $('#kaic-stop').prop('disabled', false).show();
+        $('.kaic-spinner').addClass('is-active');
 
         processNext();
     }
 
     function stopProcessing() {
         isProcessing = false;
-        $('#akic-start').prop('disabled', false);
-        $('#akic-stop').prop('disabled', true);
-        $('.akic-spinner').removeClass('is-active');
+        $('#kaic-start').prop('disabled', false);
+        $('#kaic-stop').prop('disabled', true);
+        $('.kaic-spinner').removeClass('is-active');
     }
 
-    $('#akic-start').on('click', startProcessing);
-    $('#akic-stop').on('click', stopProcessing);
+    $('#kaic-start').on('click', startProcessing);
+    $('#kaic-stop').on('click', stopProcessing);
 });

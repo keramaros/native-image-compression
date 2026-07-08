@@ -47,11 +47,11 @@ class Media_Compression_Stats
             return;
         }
 
-        wp_enqueue_style('akic-admin-css', plugin_dir_url(__FILE__) . 'assets/css/admin.css', array('dashicons'), '1.0.0');
-        wp_enqueue_script('akic-admin-js', plugin_dir_url(__FILE__) . 'assets/js/admin.js', array('jquery'), '1.0.0', true);
+        wp_enqueue_style('kaic-admin-css', plugin_dir_url(__FILE__) . 'assets/css/admin.css', array('dashicons'), '1.0.0');
+        wp_enqueue_script('kaic-admin-js', plugin_dir_url(__FILE__) . 'assets/js/admin.js', array('jquery'), '1.0.0', true);
 
-        wp_localize_script('akic-admin-js', 'akic_vars', array(
-            'nonce' => wp_create_nonce('akic_nonce')
+        wp_localize_script('kaic-admin-js', 'kaic_vars', array(
+            'nonce' => wp_create_nonce('kaic_nonce')
         ));
     }
 

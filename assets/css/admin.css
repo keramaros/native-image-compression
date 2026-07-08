@@ -1,44 +1,44 @@
-.akic-dashboard { margin: 20px 20px 0 2px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; }
-.akic-top-sections { display: flex; gap: 40px; margin-bottom: 30px;  background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 4px;}
-.akic-section { flex: 1; }
-.akic-section h2 { font-size: 1.3rem; margin-top: 0; margin-bottom: 10px; font-weight: 500; }
-.akic-section p { color: #646970; }
+.kaic-dashboard { margin: 20px 20px 0 2px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; }
+.kaic-top-sections { display: flex; gap: 40px; margin-bottom: 30px;  background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 4px;}
+.kaic-section { flex: 1; }
+.kaic-section h2 { font-size: 1.3rem; margin-top: 0; margin-bottom: 10px; font-weight: 500; }
+.kaic-section p { color: #646970; }
 
-.akic-stats-box { display: flex; justify-content: space-between; background: #fff; border: 1px solid #ccd0d4; padding: 20px; gap: 30px; margin: 20px 0; border-radius: 4px; }
-.akic-stat { display: flex; flex-direction: column; }
-.akic-stat .label { font-size: 11px; color: #a7aaad; font-weight: 600; margin-bottom: 5px; }
-.akic-stat .value { font-size: 24px; font-weight: 700; color: #2c3338; }
-.akic-stat .value .dashicons { font-size: 16px; width: 16px; height: 16px; vertical-align: middle; color: #2c3338; }
+.kaic-stats-box { display: flex; justify-content: space-between; background: #fff; border: 1px solid #ccd0d4; padding: 20px; gap: 30px; margin: 20px 0; border-radius: 4px; }
+.kaic-stat { display: flex; flex-direction: column; }
+.kaic-stat .label { font-size: 11px; color: #a7aaad; font-weight: 600; margin-bottom: 5px; }
+.kaic-stat .value { font-size: 24px; font-weight: 700; color: #2c3338; }
+.kaic-stat .value .dashicons { font-size: 16px; width: 16px; height: 16px; vertical-align: middle; color: #2c3338; }
 
 .remember-label { font-weight: 600; color: #2c3338; }
 
-.akic-savings-container { display: flex; align-items: center; gap: 40px; margin-top: 20px; }
-.akic-savings-circle { width: 120px; height: 120px; border-radius: 50%; border: 8px solid #f0f0f1; display: flex; align-items: center; justify-content: center; position: relative; }
-.akic-savings-circle .inner { display: flex; flex-direction: column; align-items: center; }
-.akic-savings-circle #akic-total-saved-percent { font-size: 28px; font-weight: 700; color: #2271b1; }
-.akic-savings-circle .subtext { font-size: 14px; color: #2271b1; }
+.kaic-savings-container { display: flex; align-items: center; gap: 40px; margin-top: 20px; }
+.kaic-savings-circle { width: 120px; height: 120px; border-radius: 50%; border: 8px solid #f0f0f1; display: flex; align-items: center; justify-content: center; position: relative; }
+.kaic-savings-circle .inner { display: flex; flex-direction: column; align-items: center; }
+.kaic-savings-circle #kaic-total-saved-percent { font-size: 28px; font-weight: 700; color: #2271b1; }
+.kaic-savings-circle .subtext { font-size: 14px; color: #2271b1; }
 
-.akic-savings-stats { display: flex; flex-direction: column; gap: 10px; }
-.akic-savings-stats .stat-line { display: flex; align-items: baseline; gap: 10px; }
-.akic-savings-stats .stat-line .value { font-size: 16px; font-weight: 600; min-width: 60px; text-align: right; }
-.akic-savings-stats .stat-line .label { color: #646970; }
-.akic-savings-stats .stat-line.highlighted .value { color: #2271b1; }
-.akic-savings-stats .stat-line.highlighted .label { color: #2271b1; opacity: 0.8; }
+.kaic-savings-stats { display: flex; flex-direction: column; gap: 10px; }
+.kaic-savings-stats .stat-line { display: flex; align-items: baseline; gap: 10px; }
+.kaic-savings-stats .stat-line .value { font-size: 16px; font-weight: 600; min-width: 60px; text-align: right; }
+.kaic-savings-stats .stat-line .label { color: #646970; }
+.kaic-savings-stats .stat-line.highlighted .value { color: #2271b1; }
+.kaic-savings-stats .stat-line.highlighted .label { color: #2271b1; opacity: 0.8; }
 
-.akic-upgrade-banner { background: #f0f6fb; padding: 40px; text-align: center; border-radius: 4px; margin-bottom: 30px; }
-.akic-upgrade-banner p { margin: 0 0 10px 0; font-size: 14px; }
-.akic-upgrade-banner .button-hero { margin-top: 10px; background-color: #3858e9; border-color: #3858e9; }
+.kaic-upgrade-banner { background: #f0f6fb; padding: 40px; text-align: center; border-radius: 4px; margin-bottom: 30px; }
+.kaic-upgrade-banner p { margin: 0 0 10px 0; font-size: 14px; }
+.kaic-upgrade-banner .button-hero { margin-top: 10px; background-color: #3858e9; border-color: #3858e9; }
 
-.akic-progress-section { margin-top: 30px; }
-.akic-controls { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; justify-content: center; }
-.akic-spinner.spinner { float: none; visibility: hidden; margin: 0; }
-.akic-spinner.spinner.is-active { visibility: visible; }
+.kaic-progress-section { margin-top: 30px; }
+.kaic-controls { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; justify-content: center; }
+.kaic-spinner.spinner { float: none; visibility: hidden; margin: 0; }
+.kaic-spinner.spinner.is-active { visibility: visible; }
 
-#akic-progress-table-container { margin-top: 20px; }
-#akic-progress-table-container table { background: #fff; border: 1px solid #ccd0d4; border-spacing: 0; width: 100%; }
-#akic-progress-table-container th { background: #f6f7f7; text-align: left; padding: 12px; font-weight: 500; border-bottom: 1px solid #ccd0d4; }
-#akic-progress-table-container td { padding: 12px; border-bottom: 1px solid #f0f0f1; vertical-align: middle; }
-#akic-progress-log tr:last-child td { border-bottom: none; }
+#kaic-progress-table-container { margin-top: 20px; }
+#kaic-progress-table-container table { background: #fff; border: 1px solid #ccd0d4; border-spacing: 0; width: 100%; }
+#kaic-progress-table-container th { background: #f6f7f7; text-align: left; padding: 12px; font-weight: 500; border-bottom: 1px solid #ccd0d4; }
+#kaic-progress-table-container td { padding: 12px; border-bottom: 1px solid #f0f0f1; vertical-align: middle; }
+#kaic-progress-log tr:last-child td { border-bottom: none; }
 
 .column-file { width: 40%; }
 .column-initial-size { width: 15%; }
@@ -46,5 +46,5 @@
 .column-savings { width: 15%; }
 .column-status { width: 15%; }
 
-#akic-progress-log tr.error { background-color: #fcf0f1; }
-#akic-progress-log .status .dashicons { font-size: 20px; width: 20px; height: 20px; }
+#kaic-progress-log tr.error { background-color: #fcf0f1; }
+#kaic-progress-log .status .dashicons { font-size: 20px; width: 20px; height: 20px; }
