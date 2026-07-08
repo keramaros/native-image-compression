@@ -19,13 +19,75 @@ class Media_Compression_Stats
     public function __construct()
     {
         add_action('admin_menu', array($this, 'add_admin_menu'));
+        add_action('admin_init', array($this, 'register_settings'));
+        add_action('admin_init', array($this, 'handle_activation_redirect'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_assets'));
         add_action('wp_ajax_kaic_get_next_image', array($this, 'ajax_get_next_image'));
         add_action('wp_ajax_kaic_process_image', array($this, 'ajax_process_image'));
+        add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'add_plugin_action_links'));
+
+        register_activation_hook(__FILE__, array($this, 'activate'));
     }
 
     /**
-     * Add Submenu under Media
+     * Handle Plugin Activation
+     */
+    public function activate()
+    {
+        set_transient('kaic_activation_redirect', true, 30);
+    }
+
+    /**
+     * Redirect to Image Compression page on activation
+     */
+    public function handle_activation_redirect()
+    {
+        if (get_transient('kaic_activation_redirect')) {
+            delete_transient('kaic_activation_redirect');
+
+            // Do not redirect if we are already on the page or if it is a bulk activation
+            if (isset($_GET['activate-multi'])) {
+                return;
+            }
+
+            wp_safe_redirect(admin_url('upload.php?page=image-compression-stats'));
+            exit;
+        }
+    }
+
+    /**
+     * Add Action Links to Plugins Page
+     */
+    public function add_plugin_action_links($links)
+    {
+        $settings_link = '<a href="options-general.php?page=image-compression-settings">' . __('Settings', 'media-compression-stats') . '</a>';
+        $compression_link = '<a href="upload.php?page=image-compression-stats">' . __('Image Compression', 'media-compression-stats') . '</a>';
+
+        array_unshift($links, $compression_link);
+        array_unshift($links, $settings_link);
+
+        return $links;
+    }
+
+    /**
+     * Register Settings
+     */
+    public function register_settings()
+    {
+        register_setting('kaic_settings_group', 'kaic_max_dimension', array(
+            'type' => 'integer',
+            'sanitize_callback' => 'absint',
+            'default' => 2048,
+        ));
+        register_setting('kaic_settings_group', 'kaic_quality', array(
+            'type' => 'integer',
+            'sanitize_callback' => 'absint',
+            'default' => 70,
+        ));
+    }
+
+    /**
+     * Add Submenu under Media and Settings
      */
     public function add_admin_menu()
     {
@@ -35,6 +97,14 @@ class Media_Compression_Stats
             'manage_options',
             'image-compression-stats',
             array($this, 'render_dashboard')
+        );
+
+        add_options_page(
+            __('Image Compression', 'media-compression-stats'),
+            __('Image Compression', 'media-compression-stats'),
+            'manage_options',
+            'image-compression-settings',
+            array($this, 'render_settings_page')
         );
     }
 
@@ -62,6 +132,41 @@ class Media_Compression_Stats
     {
         $stats = $this->get_stats();
         include plugin_dir_path(__FILE__) . 'templates/dashboard.php';
+    }
+
+    /**
+     * Render Settings Page HTML
+     */
+    public function render_settings_page()
+    {
+        ?>
+        <div class="wrap">
+            <h1><?php _e('Image Compression Settings', 'media-compression-stats'); ?></h1>
+            <form method="post" action="options.php">
+                <?php
+                settings_fields('kaic_settings_group');
+                do_settings_sections('kaic_settings_group');
+                ?>
+                <table class="form-table">
+                    <tr valign="top">
+                        <th scope="row"><?php _e('Max Dimension', 'media-compression-stats'); ?></th>
+                        <td>
+                            <input type="number" name="kaic_max_dimension" value="<?php echo esc_attr(get_option('kaic_max_dimension', 2048)); ?>" />
+                            <p class="description"><?php _e('The maximum width or height for compressed images.', 'media-compression-stats'); ?></p>
+                        </td>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row"><?php _e('Quality', 'media-compression-stats'); ?></th>
+                        <td>
+                            <input type="number" name="kaic_quality" value="<?php echo esc_attr(get_option('kaic_quality', 70)); ?>" min="1" max="100" />
+                            <p class="description"><?php _e('The quality level for compressed images (1-100).', 'media-compression-stats'); ?></p>
+                        </td>
+                    </tr>
+                </table>
+                <?php submit_button(); ?>
+            </form>
+        </div>
+        <?php
     }
 
     /**
@@ -299,17 +404,18 @@ class Media_Compression_Stats
             return new WP_Error('file_not_found', sprintf(__('File does not exist: %s', 'media-compression-stats'), basename($file)));
         }
 
-        $max_dimension = 2048;
+        $max_dimension = get_option('kaic_max_dimension', 2048);
+        $quality = get_option('kaic_quality', 70);
 
         $editor = wp_get_image_editor($file);
         if (!is_wp_error($editor)) {
-            // Ensure it does not exceed 2048 in width or height
+            // Ensure it does not exceed max dimension in width or height
             $size = $editor->get_size();
             if ($size['width'] > $max_dimension || $size['height'] > $max_dimension) {
                 $editor->resize($max_dimension, $max_dimension, false);
             }
 
-            $editor->set_quality(70); // Reduce quality to 70
+            $editor->set_quality($quality); // Reduce quality
             $editor->save($file);
         }
 
@@ -322,13 +428,13 @@ class Media_Compression_Stats
                 if (file_exists($thumb_path)) {
                     $thumb_editor = wp_get_image_editor($thumb_path);
                     if (!is_wp_error($thumb_editor)) {
-                        // Thumbnails are usually smaller than 2048, but we apply the same logic for safety
+                        // Thumbnails are usually smaller than max dimension, but we apply the same logic for safety
                         $thumb_size = $thumb_editor->get_size();
                         if ($thumb_size['width'] > $max_dimension || $thumb_size['height'] > $max_dimension) {
                             $thumb_editor->resize($max_dimension, $max_dimension, false);
                         }
 
-                        $thumb_editor->set_quality(70);
+                        $thumb_editor->set_quality($quality);
                         $thumb_editor->save($thumb_path);
                     }
                 }
