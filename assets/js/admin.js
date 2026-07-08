@@ -1,40 +1,41 @@
 jQuery(document).ready(function($) {
     let isProcessing = false;
-    const nonce = kaic_vars.nonce;
+    const nonce = akic_vars.nonce;
 
     function updateStats(stats) {
-        $('#kaic-total-attachments').text(stats.total_attachments);
-        $('#kaic-total-files').text(stats.total_files);
-        $('#kaic-original-size').text(stats.original_size_formatted);
-        $('#kaic-optimized-size').text(stats.optimized_size_formatted);
-        $('#kaic-total-saved-percent').text(stats.total_saved_percent + '%');
-        
-        const percent = stats.total_attachments > 0 ? Math.round((stats.processed_count / stats.total_attachments) * 100) : 0;
-        $('.kaic-progress-bar-fill').css('width', percent + '%');
-        $('.kaic-progress-text').text(percent + '% (' + stats.processed_count + ' / ' + stats.total_attachments + ' Images Compressed)');
+        $('#akic-total-attachments').text(stats.total_attachments);
+        $('#akic-total-files').text(stats.total_files);
+        $('#akic-processed-count').text(stats.processed_count);
+        $('#akic-original-size').text(stats.original_size_formatted);
+        $('#akic-optimized-size').text(stats.optimized_size_formatted);
+        $('#akic-total-saved-percent').text(stats.total_saved_percent + '%');
     }
 
     function addRow(imageData) {
-        const row = $('<tr id="kaic-row-' + imageData.id + '">' +
-            '<td><img src="' + imageData.thumb + '" style="width: 50px; height: auto;"></td>' +
-            '<td>' + imageData.filename + '</td>' +
-            '<td>' + imageData.original_size + '</td>' +
-            '<td class="optimized-size">-</td>' +
-            '<td class="savings">-</td>' +
-            '<td class="status"><span class="spinner is-active" style="float: none; visibility: visible; margin: 0;"></span></td>' +
+        const row = $('<tr id="akic-row-' + imageData.id + '">' +
+            '<td class="column-file">' +
+                '<div style="display: flex; align-items: center; gap: 10px;">' +
+                    '<img src="' + imageData.thumb + '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">' +
+                    '<span>' + imageData.filename + '</span>' +
+                '</div>' +
+            '</td>' +
+            '<td class="column-initial-size">' + imageData.original_size + '</td>' +
+            '<td class="column-current-size">-</td>' +
+            '<td class="column-savings">-</td>' +
+            '<td class="column-status"><span class="spinner is-active" style="float: none; visibility: visible; margin: 0;"></span></td>' +
             '</tr>');
-        $('#kaic-progress-log').append(row);
+        $('#akic-progress-log').append(row);
     }
 
     function updateRow(imageData) {
-        const $row = $('#kaic-row-' + imageData.id);
+        const $row = $('#akic-row-' + imageData.id);
         if (imageData.error) {
             $row.addClass('error');
-            $row.find('.status').html('<span class="dashicons dashicons-warning" style="color: #d63638;"></span> ' + imageData.error);
+            $row.find('.column-status').html('<span class="dashicons dashicons-warning" style="color: #d63638;"></span> ' + imageData.error);
         } else {
-            $row.find('.optimized-size').text(imageData.optimized_size);
-            $row.find('.savings').text(imageData.saved_percent + '%');
-            $row.find('.status').html('<span class="dashicons dashicons-yes" style="color: #46b450;"></span>');
+            $row.find('.column-current-size').text(imageData.optimized_size);
+            $row.find('.column-savings').text(imageData.saved_percent + '%');
+            $row.find('.column-status').html('<span class="dashicons dashicons-yes" style="color: #46b450;"></span>');
         }
     }
 
@@ -117,21 +118,20 @@ jQuery(document).ready(function($) {
 
     function startProcessing() {
         isProcessing = true;
-        $('#kaic-start').prop('disabled', true);
-        $('#kaic-stop').prop('disabled', false).show();
-        $('.kaic-spinner').addClass('is-active');
-        $('.kaic-progress-text, .kaic-progress-bar-container, #kaic-progress-table-container').show();
+        $('#akic-start').prop('disabled', true);
+        $('#akic-stop').prop('disabled', false).show();
+        $('.akic-spinner').addClass('is-active');
 
         processNext();
     }
 
     function stopProcessing() {
         isProcessing = false;
-        $('#kaic-start').prop('disabled', false);
-        $('#kaic-stop').prop('disabled', true);
-        $('.kaic-spinner').removeClass('is-active');
+        $('#akic-start').prop('disabled', false);
+        $('#akic-stop').prop('disabled', true);
+        $('.akic-spinner').removeClass('is-active');
     }
 
-    $('#kaic-start').on('click', startProcessing);
-    $('#kaic-stop').on('click', stopProcessing);
+    $('#akic-start').on('click', startProcessing);
+    $('#akic-stop').on('click', stopProcessing);
 });

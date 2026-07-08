@@ -1,34 +1,50 @@
-.kaic-dashboard { margin: 20px 20px 0 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; }
-.kaic-stats-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-.kaic-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e5e5; }
-.kaic-card h3 { margin: 0 0 10px 0; font-size: 14px; color: #646970; text-transform: uppercase; letter-spacing: 0.05em; }
-.kaic-card .value { font-size: 24px; font-weight: 600; color: #1d2327; }
-.kaic-progress-section { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e5e5; margin-bottom: 30px; }
-.kaic-progress-bar-container { background: #f0f0f1; height: 24px; border-radius: 12px; overflow: hidden; margin: 20px 0; border: 1px solid #dcdcde; }
-.kaic-progress-bar-fill { background: #2271b1; height: 100%; width: 0%; transition: width 0.3s ease; }
-.kaic-progress-text { text-align: center; font-weight: 500; margin-bottom: 10px; }
-.kaic-controls { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
-.kaic-spinner.spinner { float: none; visibility: hidden; margin: 0; }
-.kaic-spinner.spinner.is-active { visibility: visible; }
-.kaic-log-container { background: #1d2327; color: #f0f0f1; padding: 15px; border-radius: 4px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 13px; line-height: 1.5; }
-.kaic-log-entry { margin-bottom: 4px; border-bottom: 1px solid #3c434a; padding-bottom: 2px; }
-.kaic-log-entry.success { color: #7ad03a; }
-.kaic-log-entry.info { color: #72aee6; }
+.akic-dashboard { margin: 20px 20px 0 2px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; }
+.akic-top-sections { display: flex; gap: 40px; margin-bottom: 30px;  background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 4px;}
+.akic-section { flex: 1; }
+.akic-section h2 { font-size: 1.3rem; margin-top: 0; margin-bottom: 10px; font-weight: 500; }
+.akic-section p { color: #646970; }
 
-#kaic-progress-table-container table {
-    margin-top: 10px;
-}
+.akic-stats-box { display: flex; justify-content: space-between; background: #fff; border: 1px solid #ccd0d4; padding: 20px; gap: 30px; margin: 20px 0; border-radius: 4px; }
+.akic-stat { display: flex; flex-direction: column; }
+.akic-stat .label { font-size: 11px; color: #a7aaad; font-weight: 600; margin-bottom: 5px; }
+.akic-stat .value { font-size: 24px; font-weight: 700; color: #2c3338; }
+.akic-stat .value .dashicons { font-size: 16px; width: 16px; height: 16px; vertical-align: middle; color: #2c3338; }
 
-#kaic-progress-log tr.error {
-    background-color: #fcf0f1;
-}
+.remember-label { font-weight: 600; color: #2c3338; }
 
-#kaic-progress-log td {
-    vertical-align: middle;
-}
+.akic-savings-container { display: flex; align-items: center; gap: 40px; margin-top: 20px; }
+.akic-savings-circle { width: 120px; height: 120px; border-radius: 50%; border: 8px solid #f0f0f1; display: flex; align-items: center; justify-content: center; position: relative; }
+.akic-savings-circle .inner { display: flex; flex-direction: column; align-items: center; }
+.akic-savings-circle #akic-total-saved-percent { font-size: 28px; font-weight: 700; color: #2271b1; }
+.akic-savings-circle .subtext { font-size: 14px; color: #2271b1; }
 
-#kaic-progress-log .status .dashicons {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-}
+.akic-savings-stats { display: flex; flex-direction: column; gap: 10px; }
+.akic-savings-stats .stat-line { display: flex; align-items: baseline; gap: 10px; }
+.akic-savings-stats .stat-line .value { font-size: 16px; font-weight: 600; min-width: 60px; text-align: right; }
+.akic-savings-stats .stat-line .label { color: #646970; }
+.akic-savings-stats .stat-line.highlighted .value { color: #2271b1; }
+.akic-savings-stats .stat-line.highlighted .label { color: #2271b1; opacity: 0.8; }
+
+.akic-upgrade-banner { background: #f0f6fb; padding: 40px; text-align: center; border-radius: 4px; margin-bottom: 30px; }
+.akic-upgrade-banner p { margin: 0 0 10px 0; font-size: 14px; }
+.akic-upgrade-banner .button-hero { margin-top: 10px; background-color: #3858e9; border-color: #3858e9; }
+
+.akic-progress-section { margin-top: 30px; }
+.akic-controls { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; justify-content: center; }
+.akic-spinner.spinner { float: none; visibility: hidden; margin: 0; }
+.akic-spinner.spinner.is-active { visibility: visible; }
+
+#akic-progress-table-container { margin-top: 20px; }
+#akic-progress-table-container table { background: #fff; border: 1px solid #ccd0d4; border-spacing: 0; width: 100%; }
+#akic-progress-table-container th { background: #f6f7f7; text-align: left; padding: 12px; font-weight: 500; border-bottom: 1px solid #ccd0d4; }
+#akic-progress-table-container td { padding: 12px; border-bottom: 1px solid #f0f0f1; vertical-align: middle; }
+#akic-progress-log tr:last-child td { border-bottom: none; }
+
+.column-file { width: 40%; }
+.column-initial-size { width: 15%; }
+.column-current-size { width: 15%; }
+.column-savings { width: 15%; }
+.column-status { width: 15%; }
+
+#akic-progress-log tr.error { background-color: #fcf0f1; }
+#akic-progress-log .status .dashicons { font-size: 20px; width: 20px; height: 20px; }
