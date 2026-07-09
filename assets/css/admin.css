@@ -57,11 +57,11 @@
 #kaic-progress-table-container td { padding: 12px; border-bottom: 1px solid #f0f0f1; vertical-align: middle; }
 #kaic-progress-log tr:last-child td { border-bottom: none; }
 
-.column-file { width: 40%; }
+.column-image { width: 40%; }
 .column-initial-size { width: 15%; }
-.column-current-size { width: 15%; }
+.column-compressed-size { width: 15%; }
 .column-savings { width: 15%; }
 .column-status { width: 15%; }
 
 #kaic-progress-log tr.error { background-color: #fcf0f1; }
-#kaic-progress-log .status .dashicons { font-size: 20px; width: 20px; height: 20px; }
+#kaic-progress-log .column-status .dashicons { font-size: 20px; width: 20px; height: 20px; }

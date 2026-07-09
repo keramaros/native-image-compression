@@ -7,21 +7,21 @@ jQuery(document).ready(function($) {
         $('#kaic-total-files').text(stats.total_files);
         $('#kaic-processed-count').text(stats.processed_count);
         $('#kaic-original-size').text(stats.original_size_formatted);
-        $('#kaic-optimized-size').text(stats.optimized_size_formatted);
+        $('#kaic-compressed-size').text(stats.compressed_size_formatted);
         $('#kaic-total-saved-percent').text(stats.total_saved_percent + '%');
         $('.kaic-savings-circle').css('--percentage', stats.total_saved_percent);
     }
 
     function addRow(imageData) {
         const row = $('<tr id="kaic-row-' + imageData.id + '">' +
-            '<td class="column-file">' +
+            '<td class="column-image">' +
                 '<div style="display: flex; align-items: center; gap: 10px;">' +
                     '<img src="' + imageData.thumb + '" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">' +
                     '<span>' + imageData.filename + '</span>' +
                 '</div>' +
             '</td>' +
             '<td class="column-initial-size">' + imageData.original_size + '</td>' +
-            '<td class="column-current-size">-</td>' +
+            '<td class="column-compressed-size">-</td>' +
             '<td class="column-savings">-</td>' +
             '<td class="column-status"><span class="spinner is-active" style="float: none; visibility: visible; margin: 0;"></span></td>' +
             '</tr>');
@@ -34,7 +34,7 @@ jQuery(document).ready(function($) {
             $row.addClass('error');
             $row.find('.column-status').html('<span class="dashicons dashicons-warning" style="color: #d63638;"></span> ' + imageData.error);
         } else {
-            $row.find('.column-current-size').text(imageData.optimized_size);
+            $row.find('.column-compressed-size').text(imageData.optimized_size);
             $row.find('.column-savings').text(imageData.saved_percent + '%');
             $row.find('.column-status').html('<span class="dashicons dashicons-yes" style="color: #46b450;"></span>');
         }
