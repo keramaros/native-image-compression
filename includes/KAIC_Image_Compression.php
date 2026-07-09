@@ -181,7 +181,7 @@ class KAIC_Image_Compression
 
         $attachments = get_posts(array(
                 'post_type' => 'attachment',
-                'post_mime_type' => 'image/',
+                'post_mime_type' => 'image',
                 'posts_per_page' => -1,
                 'fields' => 'ids',
         ));
@@ -325,7 +325,10 @@ class KAIC_Image_Compression
 
         $attachment_id = isset($_POST['id']) ? intval($_POST['id']) : 0;
         if (!$attachment_id) {
-            wp_send_json_error('Invalid ID');
+            wp_send_json_error(array(
+                'message' => 'Invalid ID',
+                'stats' => $this->get_stats()
+            ));
         }
 
         // 1. Save original size
