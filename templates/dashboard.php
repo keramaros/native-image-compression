@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
                     <span class="value" id="kaic-total-attachments"><?php echo esc_html($stats['total_attachments']); ?></span>
                 </div>
                 <div class="kaic-stat">
-                    <span class="label"><?php _e('TOTAL IMAGE FILES', 'kaic-image-compression'); ?></span>
+                    <span class="label"><?php _e('TOTAL FILES', 'kaic-image-compression'); ?></span>
                     <span class="value" id="kaic-total-files"><?php echo esc_html($stats['total_files']); ?></span>
                 </div>
             </div>
