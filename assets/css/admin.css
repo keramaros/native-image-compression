@@ -47,7 +47,10 @@
 .kaic-upgrade-banner .button-hero { margin-top: 10px; background-color: #3858e9; border-color: #3858e9; }
 
 .kaic-progress-section { margin-top: 30px; }
-.kaic-controls { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; justify-content: center; }
+.kaic-controls { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.kaic-settings-link { width: 100%; text-align: center; margin-top: 5px; }
+.kaic-settings-link a { text-decoration: none; color: #2271b1; font-size: 13px; }
+.kaic-settings-link a:hover { text-decoration: underline; }
 .kaic-spinner.spinner { float: none; visibility: hidden; margin: 0; }
 .kaic-spinner.spinner.is-active { visibility: visible; }
 

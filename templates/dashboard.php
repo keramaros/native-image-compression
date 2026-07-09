@@ -64,6 +64,9 @@ if (!defined('ABSPATH')) {
     <div class="kaic-progress-section">
         <div class="kaic-controls">
             <button id="kaic-start" class="button button-primary"><?php _e('Start Compression', 'kaic-image-compression'); ?></button>
+            <div class="kaic-settings-link">
+                <a href="<?php echo esc_url(admin_url('options-general.php?page=kaic-image-compression-settings')); ?>"><?php _e('Tune compression settings', 'kaic-image-compression'); ?></a>
+            </div>
             <button id="kaic-stop" class="button button-secondary" disabled style="display: none;"><?php _e('Stop', 'kaic-image-compression'); ?></button>
             <span class="kaic-spinner spinner"></span>
         </div>
