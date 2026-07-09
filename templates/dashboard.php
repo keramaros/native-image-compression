@@ -50,7 +50,7 @@ if (!defined('ABSPATH')) {
                     </div>
                     <div class="stat-line highlighted">
                         <span class="value" id="kaic-compressed-size"><?php echo esc_html($stats['compressed_size_formatted']); ?></span>
-                        <span class="label"><?php _e('Compressed', 'kaic-image-compression'); ?></span>
+                        <span class="label"><?php _e('compressed', 'kaic-image-compression'); ?></span>
                     </div>
                 </div>
             </div>
