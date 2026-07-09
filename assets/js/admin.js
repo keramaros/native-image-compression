@@ -5,6 +5,7 @@ jQuery(document).ready(function($) {
     function updateStats(stats) {
         $('#kaic-total-attachments').text(stats.total_attachments);
         $('#kaic-total-files').text(stats.total_files);
+        $('.kaic-processed-percent').text(stats.processed_percent);
         $('#kaic-processed-count').text(stats.processed_count);
         $('#kaic-original-size').text(stats.original_size_formatted);
         $('#kaic-compressed-size').text(stats.compressed_size_formatted);

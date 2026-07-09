@@ -21,7 +21,15 @@ if (!defined('ABSPATH')) {
                 </div>
                 <div class="kaic-stat">
                     <span class="label"><?php _e('TOTAL FILES', 'kaic-image-compression'); ?></span>
-                    <span class="value" id="kaic-total-files"><?php echo esc_html($stats['total_files']); ?></span>
+                    <span class="value">
+                        <span id="kaic-total-files"><?php echo esc_html($stats['total_files']); ?></span>
+                    </span>
+                </div>
+                <div class="kaic-stat">
+                    <span class="label"><?php _e('COMPRESSED', 'kaic-image-compression'); ?></span>
+                    <span class="value">
+                        <span class="percentage"><span class="kaic-processed-percent"><?php echo esc_html($stats['processed_percent']); ?></span>%</span>
+                    </span>
                 </div>
             </div>
 

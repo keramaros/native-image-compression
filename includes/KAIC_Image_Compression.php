@@ -219,7 +219,8 @@ class KAIC_Image_Compression
                 'compressed_size' => $total_compressed_size,
                 'original_size_formatted' => size_format((float)$total_original_size, 2),
                 'compressed_size_formatted' => size_format((float)$total_compressed_size, 2),
-                'total_saved_percent' => $total_original_size > 0 ? round((($total_original_size - $total_compressed_size) / $total_original_size) * 100, 2) : 0,
+                'total_saved_percent' => $total_original_size > 0 ? round((($total_original_size - $total_compressed_size) / $total_original_size) * 100, 1) : 0,
+                'processed_percent' => $total_attachments > 0 ? round(($processed_count / $total_attachments) * 100, 1) : 0,
         );
     }
 
