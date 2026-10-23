@@ -1,4 +1,4 @@
-=== Image Compression ===
+=== Native Image Compression ===
 Contributors: keramaros
 Donate link: https://keramaros.gr
 Tags: image compression, compress images, optimize images, image optimizer, media library
@@ -13,7 +13,7 @@ Shrink image file sizes by automatically resizing dimensions and adjusting quali
 
 == Description ==
 
-Image Compression is an image optimization plugin for WordPress that helps you bulk compress images in your media library. It resizes oversized images to configured maximum dimensions and optimizes image quality using WordPress built-in image editors.
+Native Image Compression is an image optimization plugin for WordPress that helps you bulk compress images in your media library. It resizes oversized images to configured maximum dimensions and optimizes image quality using WordPress built-in image editors.
 
 Key Features:
 * Bulk compress all images in your media library.
@@ -23,9 +23,9 @@ Key Features:
 
 == Installation ==
 
-1. Upload the `image-compression` folder to the `/wp-content/plugins/` directory, or install the plugin directly through the WordPress plugins screen.
+1. Upload the `native-image-compression` folder to the `/wp-content/plugins/` directory, or install the plugin directly through the WordPress plugins screen.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Navigate to **Media > Bulk Compression** to start optimizing your images or **Settings > Image Compression** to adjust compression parameters.
+3. Navigate to **Media > Bulk Compression** to start optimizing your images or **Settings > Native Image Compression** to adjust compression parameters.
 
 == Frequently Asked Questions ==
 
@@ -33,4 +33,4 @@ Key Features:
 The plugin resizes and optimizes image files in place if the compressed version is smaller than the original.
 
 = Can I choose the compression quality? =
-Yes, you can adjust the compression quality and maximum dimensions under **Settings > Image Compression**.
+Yes, you can adjust the compression quality and maximum dimensions under **Settings > Native Image Compression**.
