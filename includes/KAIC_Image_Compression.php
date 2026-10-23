@@ -264,7 +264,10 @@ class KAIC_Image_Compression
                                 </a>
                                 <?php if ($log_exists) : ?>
                                     <span class="description" style="margin-left: 8px;">
-                                        <?php printf(esc_html__('Log file size: %s', 'native-image-compression'), esc_html(size_format(filesize($log_path)))); ?>
+                                        <?php
+                                        /* translators: %s: Formatted file size. */
+                                        printf(esc_html__('Log file size: %s', 'native-image-compression'), esc_html(size_format(filesize($log_path))));
+                                        ?>
                                     </span>
                                 <?php else : ?>
                                     <span class="description" style="margin-left: 8px;">
@@ -365,6 +368,7 @@ class KAIC_Image_Compression
         }
 
         if (!file_exists($file)) {
+            /* translators: %s: File name. */
             return new WP_Error('file_not_found', sprintf(__('File does not exist: %s', 'native-image-compression'), basename($file)));
         }
 
@@ -552,6 +556,7 @@ class KAIC_Image_Compression
         }
 
         if (!file_exists($file)) {
+            /* translators: %s: File name. */
             return new WP_Error('file_not_found', sprintf(__('File does not exist: %s', 'native-image-compression'), basename($file)));
         }
 
@@ -620,6 +625,7 @@ class KAIC_Image_Compression
     {
         $original_size = filesize($file);
         if ($original_size === false) {
+            /* translators: %s: File name. */
             return new WP_Error('filesize_failed', sprintf(__('Failed to read file size: %s', 'native-image-compression'), basename($file)));
         }
 
@@ -631,8 +637,19 @@ class KAIC_Image_Compression
         $extension = pathinfo($file, PATHINFO_EXTENSION);
         if ($extension !== '') {
             $temp_file_with_extension = $temp_file . '.' . $extension;
-            if (!rename($temp_file, $temp_file_with_extension)) {
-                unlink($temp_file);
+            global $wp_filesystem;
+            if (empty($wp_filesystem)) {
+                require_once ABSPATH . '/wp-admin/includes/file.php';
+                WP_Filesystem();
+            }
+
+            $moved = false;
+            if ($wp_filesystem) {
+                $moved = $wp_filesystem->move($temp_file, $temp_file_with_extension, true);
+            }
+
+            if (!$moved) {
+                wp_delete_file($temp_file);
                 return new WP_Error('rename_failed', __('Failed to rename temporary file.', 'native-image-compression'));
             }
             $temp_file = $temp_file_with_extension;
@@ -641,7 +658,7 @@ class KAIC_Image_Compression
         $result = $editor->save($temp_file);
         if (is_wp_error($result)) {
             if (file_exists($temp_file)) {
-                unlink($temp_file);
+                wp_delete_file($temp_file);
             }
             return $result;
         }
@@ -655,10 +672,10 @@ class KAIC_Image_Compression
         }
 
         if (file_exists($compressed_file)) {
-            unlink($compressed_file);
+            wp_delete_file($compressed_file);
         }
         if ($compressed_file !== $temp_file && file_exists($temp_file)) {
-            unlink($temp_file);
+            wp_delete_file($temp_file);
         }
 
         return true;
