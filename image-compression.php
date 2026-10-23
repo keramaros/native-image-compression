@@ -1,16 +1,24 @@
 <?php
 /**
  * Plugin Name: Image Compression
+ * Plugin URI: https://wordpress.org/plugins/image-compression/
  * Description: An image compression plugin that shrinks file sizes by automatically resizing dimensions and adjusting quality for faster web performance.
  * Version: 1.0.0
  * Author: Keramaros Antonios
  * Author URI: https://keramaros.gr
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: kaic-image-compression
+ * Requires at least: 5.8
+ * Requires PHP: 7.4
+ * Tested up to: 7.1.3
  */
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
+define('KAIC_PLUGIN_FILE', __FILE__);
 define('KAIC_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('KAIC_PLUGIN_DIR_URL', plugin_dir_url(__FILE__));
 

@@ -7,54 +7,54 @@ if (!defined('ABSPATH')) {
 }
 ?>
 <div class="wrap kaic-dashboard">
-    <h1><?php _e('Image Compression', 'kaic-image-compression'); ?></h1>
+    <h1><?php esc_html_e('Image Compression', 'kaic-image-compression'); ?></h1>
 
     <div class="kaic-top-sections">
         <div class="kaic-section">
-            <h2><?php _e('Library overview', 'kaic-image-compression'); ?></h2>
-            <p><?php _e('Compress your full image library in one click. Press below to instantly improve your site speed!', 'kaic-image-compression'); ?></p>
+            <h2><?php esc_html_e('Library overview', 'kaic-image-compression'); ?></h2>
+            <p><?php esc_html_e('Compress your full image library in one click. Press below to instantly improve your site speed!', 'kaic-image-compression'); ?></p>
 
             <div class="kaic-stats-box">
                 <div class="kaic-stat">
-                    <span class="label"><?php _e('UPLOADED IMAGES', 'kaic-image-compression'); ?></span>
+                    <span class="label"><?php esc_html_e('UPLOADED IMAGES', 'kaic-image-compression'); ?></span>
                     <span class="value" id="kaic-total-attachments"><?php echo esc_html($stats['total_attachments']); ?></span>
                 </div>
                 <div class="kaic-stat">
-                    <span class="label"><?php _e('TOTAL FILES', 'kaic-image-compression'); ?></span>
+                    <span class="label"><?php esc_html_e('TOTAL FILES', 'kaic-image-compression'); ?></span>
                     <span class="value" id="kaic-total-files"><?php echo esc_html($stats['total_files']); ?></span>
                 </div>
                 <div class="kaic-stat">
-                    <span class="label"><?php _e('COMPRESSED', 'kaic-image-compression'); ?></span>
+                    <span class="label"><?php esc_html_e('COMPRESSED', 'kaic-image-compression'); ?></span>
                     <span class="value" id="kaic-processed-percent"><?php echo esc_html($stats['processed_percent']); ?>%</span>
                 </div>
             </div>
 
-            <p><span class="remember-label"><?php _e('Remember', 'kaic-image-compression'); ?></span> <?php _e('Keep this page open to run the plugin. If stopped, you can resume your progress at any time.', 'kaic-image-compression'); ?></p>
+            <p><span class="remember-label"><?php esc_html_e('Remember', 'kaic-image-compression'); ?></span> <?php esc_html_e('Keep this page open to run the plugin. If stopped, you can resume your progress at any time.', 'kaic-image-compression'); ?></p>
         </div>
 
         <div class="kaic-section">
-            <h2><?php _e('Total Savings', 'kaic-image-compression'); ?></h2>
-            <p><?php _e('Insights calculated from your entire media library.', 'kaic-image-compression'); ?></p>
+            <h2><?php esc_html_e('Total Savings', 'kaic-image-compression'); ?></h2>
+            <p><?php esc_html_e('Insights calculated from your entire media library.', 'kaic-image-compression'); ?></p>
 
             <div class="kaic-savings-container">
                 <div class="kaic-savings-circle" style="--percentage: <?php echo esc_attr($stats['total_saved_percent']); ?>;">
                     <div class="inner">
                         <span id="kaic-total-saved-percent"><?php echo esc_html($stats['total_saved_percent']); ?>%</span>
-                        <span class="subtext"><?php _e('savings', 'kaic-image-compression'); ?></span>
+                        <span class="subtext"><?php esc_html_e('savings', 'kaic-image-compression'); ?></span>
                     </div>
                 </div>
                 <div class="kaic-savings-stats">
                     <div class="stat-line">
                         <span class="value" id="kaic-processed-count"><?php echo esc_html($stats['processed_count']); ?></span>
-                        <span class="label"><?php _e('images compressed', 'kaic-image-compression'); ?></span>
+                        <span class="label"><?php esc_html_e('images compressed', 'kaic-image-compression'); ?></span>
                     </div>
                     <div class="stat-line">
                         <span class="value" id="kaic-original-size"><?php echo esc_html($stats['original_size_formatted']); ?></span>
-                        <span class="label"><?php _e('initial size', 'kaic-image-compression'); ?></span>
+                        <span class="label"><?php esc_html_e('initial size', 'kaic-image-compression'); ?></span>
                     </div>
                     <div class="stat-line highlighted">
                         <span class="value" id="kaic-compressed-size"><?php echo esc_html($stats['compressed_size_formatted']); ?></span>
-                        <span class="label"><?php _e('compressed', 'kaic-image-compression'); ?></span>
+                        <span class="label"><?php esc_html_e('compressed', 'kaic-image-compression'); ?></span>
                     </div>
                 </div>
             </div>
@@ -63,11 +63,11 @@ if (!defined('ABSPATH')) {
 
     <div class="kaic-progress-section">
         <div class="kaic-controls">
-            <button id="kaic-start" class="button button-primary"><?php _e('Start Compression', 'kaic-image-compression'); ?></button>
+            <button id="kaic-start" class="button button-primary"><?php esc_html_e('Start Compression', 'kaic-image-compression'); ?></button>
             <div class="kaic-settings-link">
-                <a href="<?php echo esc_url(admin_url('options-general.php?page=kaic-image-compression-settings')); ?>"><?php _e('Tune compression settings', 'kaic-image-compression'); ?></a>
+                <a href="<?php echo esc_url(admin_url('options-general.php?page=kaic-image-compression-settings')); ?>"><?php esc_html_e('Tune compression settings', 'kaic-image-compression'); ?></a>
             </div>
-            <button id="kaic-stop" class="button button-secondary" disabled style="display: none;"><?php _e('Stop', 'kaic-image-compression'); ?></button>
+            <button id="kaic-stop" class="button button-secondary" disabled style="display: none;"><?php esc_html_e('Stop', 'kaic-image-compression'); ?></button>
             <span class="kaic-spinner spinner"></span>
         </div>
 
@@ -75,11 +75,11 @@ if (!defined('ABSPATH')) {
             <table class="wp-list-table widefat fixed striped">
                 <thead>
                 <tr>
-                    <th class="column-image"><?php _e('Image', 'kaic-image-compression'); ?></th>
-                    <th class="column-initial-size"><?php _e('Initial Size', 'kaic-image-compression'); ?></th>
-                    <th class="column-compressed-size"><?php _e('Compressed', 'kaic-image-compression'); ?></th>
-                    <th class="column-savings"><?php _e('Savings', 'kaic-image-compression'); ?></th>
-                    <th class="column-status"><?php _e('Status', 'kaic-image-compression'); ?></th>
+                    <th class="column-image"><?php esc_html_e('Image', 'kaic-image-compression'); ?></th>
+                    <th class="column-initial-size"><?php esc_html_e('Initial Size', 'kaic-image-compression'); ?></th>
+                    <th class="column-compressed-size"><?php esc_html_e('Compressed', 'kaic-image-compression'); ?></th>
+                    <th class="column-savings"><?php esc_html_e('Savings', 'kaic-image-compression'); ?></th>
+                    <th class="column-status"><?php esc_html_e('Status', 'kaic-image-compression'); ?></th>
                 </tr>
                 </thead>
                 <tbody id="kaic-progress-log">

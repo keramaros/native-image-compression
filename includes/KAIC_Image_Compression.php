@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class KAIC_Image_Compression
 {
     public function __construct()
@@ -11,9 +15,10 @@ class KAIC_Image_Compression
         add_action('admin_enqueue_scripts', array($this, 'enqueue_assets'));
         add_action('wp_ajax_kaic_get_next_image', array($this, 'ajax_get_next_image'));
         add_action('wp_ajax_kaic_process_image', array($this, 'ajax_process_image'));
-        add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'add_plugin_action_links'));
 
-        register_activation_hook(__FILE__, array($this, 'activate'));
+        $plugin_file = defined('KAIC_PLUGIN_FILE') ? KAIC_PLUGIN_FILE : dirname(__DIR__) . '/image-compression.php';
+        add_filter('plugin_action_links_' . plugin_basename($plugin_file), array($this, 'add_plugin_action_links'));
+        register_activation_hook($plugin_file, array($this, 'activate'));
         register_shutdown_function(array($this, 'handle_shutdown'));
     }
 
@@ -49,7 +54,7 @@ class KAIC_Image_Compression
                 return;
             }
 
-            wp_safe_redirect(admin_url('upload.php?page=image-compression-stats'));
+            wp_safe_redirect(admin_url('upload.php?page=kaic-image-compression-bulk'));
             exit;
         }
     }
@@ -59,8 +64,8 @@ class KAIC_Image_Compression
      */
     public function add_plugin_action_links($links)
     {
-        $settings_link = '<a href="options-general.php?page=kaic-image-compression-settings">' . __('Settings', 'kaic-image-compression') . '</a>';
-        $compression_link = '<a href="upload.php?page=image-compression-stats">' . __('Image Compression', 'kaic-image-compression') . '</a>';
+        $settings_link = '<a href="' . esc_url(admin_url('options-general.php?page=kaic-image-compression-settings')) . '">' . esc_html__('Settings', 'kaic-image-compression') . '</a>';
+        $compression_link = '<a href="' . esc_url(admin_url('upload.php?page=kaic-image-compression-bulk')) . '">' . esc_html__('Bulk Compression', 'kaic-image-compression') . '</a>';
 
         array_unshift($links, $compression_link);
         array_unshift($links, $settings_link);
@@ -73,9 +78,9 @@ class KAIC_Image_Compression
      */
     public function handle_clear_log()
     {
-        if (isset($_GET['page']) && $_GET['page'] === 'kaic-image-compression-settings' && isset($_GET['action']) && $_GET['action'] === 'kaic_clear_log') {
+        if (isset($_GET['page'], $_GET['action']) && sanitize_text_field(wp_unslash($_GET['page'])) === 'kaic-image-compression-settings' && sanitize_text_field(wp_unslash($_GET['action'])) === 'kaic_clear_log') {
             if (!current_user_can('manage_options')) {
-                wp_die(__('Unauthorized user', 'kaic-image-compression'));
+                wp_die(esc_html__('Unauthorized user', 'kaic-image-compression'));
             }
 
             check_admin_referer('kaic_clear_log_nonce');
@@ -199,6 +204,10 @@ class KAIC_Image_Compression
      */
     public function render_dashboard()
     {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
         $stats = $this->get_stats();
         include KAIC_PLUGIN_DIR_PATH . 'templates/dashboard.php';
     }
@@ -208,15 +217,19 @@ class KAIC_Image_Compression
      */
     public function render_settings_page()
     {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
         $log_path = $this->get_log_file_path();
         $log_url = $this->get_log_file_url();
         $log_exists = file_exists($log_path) && filesize($log_path) > 0;
         ?>
         <div class="wrap">
-            <h1><?php _e('Image Compression Settings', 'kaic-image-compression'); ?></h1>
-            <?php if (isset($_GET['log_cleared']) && $_GET['log_cleared'] === '1') : ?>
+            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+            <?php if (isset($_GET['log_cleared']) && sanitize_text_field(wp_unslash($_GET['log_cleared'])) === '1') : ?>
                 <div class="notice notice-success is-dismissible">
-                    <p><?php _e('Error log cleared successfully.', 'kaic-image-compression'); ?></p>
+                    <p><?php esc_html_e('Error log cleared successfully.', 'kaic-image-compression'); ?></p>
                 </div>
             <?php endif; ?>
             <form method="post" action="options.php">
@@ -224,42 +237,42 @@ class KAIC_Image_Compression
                 settings_fields('kaic_settings_group');
                 do_settings_sections('kaic_settings_group');
                 ?>
-                <table class="form-table">
+                <table class="form-table" role="presentation">
                     <tr valign="top">
-                        <th scope="row"><?php _e('Max Dimension', 'kaic-image-compression'); ?></th>
+                        <th scope="row"><?php esc_html_e('Max Dimension', 'kaic-image-compression'); ?></th>
                         <td>
                             <input type="number" name="kaic_max_dimension" value="<?php echo esc_attr(get_option('kaic_max_dimension', 2048)); ?>"/>
-                            <p class="description"><?php _e('The maximum width or height for compressed images.', 'kaic-image-compression'); ?></p>
+                            <p class="description"><?php esc_html_e('The maximum width or height for compressed images.', 'kaic-image-compression'); ?></p>
                         </td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row"><?php _e('Quality', 'kaic-image-compression'); ?></th>
+                        <th scope="row"><?php esc_html_e('Quality', 'kaic-image-compression'); ?></th>
                         <td>
                             <input type="number" name="kaic_quality" value="<?php echo esc_attr(get_option('kaic_quality', 70)); ?>" min="1" max="100"/>
-                            <p class="description"><?php _e('The quality level for compressed images (1-100).', 'kaic-image-compression'); ?></p>
+                            <p class="description"><?php esc_html_e('The quality level for compressed images (1-100).', 'kaic-image-compression'); ?></p>
                         </td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row"><?php _e('Error Log', 'kaic-image-compression'); ?></th>
+                        <th scope="row"><?php esc_html_e('Error Log', 'kaic-image-compression'); ?></th>
                         <td>
                             <p>
                                 <a href="<?php echo esc_url($log_url); ?>" target="_blank" class="button button-secondary<?php echo !$log_exists ? ' disabled' : ''; ?>"<?php echo !$log_exists ? ' aria-disabled="true"' : ''; ?>>
-                                    <?php _e('View Error Log', 'kaic-image-compression'); ?>
+                                    <?php esc_html_e('View Error Log', 'kaic-image-compression'); ?>
                                 </a>
                                 <a href="<?php echo esc_url(wp_nonce_url(admin_url('options-general.php?page=kaic-image-compression-settings&action=kaic_clear_log'), 'kaic_clear_log_nonce')); ?>" class="button button-secondary<?php echo !$log_exists ? ' disabled' : ''; ?>"<?php echo !$log_exists ? ' aria-disabled="true"' : ''; ?> onclick="<?php echo $log_exists ? 'return confirm(\'' . esc_js(__('Are you sure you want to clear the error log?', 'kaic-image-compression')) . '\');' : 'return false;'; ?>">
-                                    <?php _e('Clear Log', 'kaic-image-compression'); ?>
+                                    <?php esc_html_e('Clear Log', 'kaic-image-compression'); ?>
                                 </a>
                                 <?php if ($log_exists) : ?>
                                     <span class="description" style="margin-left: 8px;">
-                                        <?php printf(__('Log file size: %s', 'kaic-image-compression'), size_format(filesize($log_path))); ?>
+                                        <?php printf(esc_html__('Log file size: %s', 'kaic-image-compression'), esc_html(size_format(filesize($log_path)))); ?>
                                     </span>
                                 <?php else : ?>
                                     <span class="description" style="margin-left: 8px;">
-                                        <?php _e('No errors logged yet.', 'kaic-image-compression'); ?>
+                                        <?php esc_html_e('No errors logged yet.', 'kaic-image-compression'); ?>
                                     </span>
                                 <?php endif; ?>
                             </p>
-                            <p class="description"><?php _e('View or clear the error log file.', 'kaic-image-compression'); ?></p>
+                            <p class="description"><?php esc_html_e('View or clear the error log file.', 'kaic-image-compression'); ?></p>
                         </td>
                     </tr>
                 </table>
@@ -392,7 +405,7 @@ class KAIC_Image_Compression
             check_ajax_referer('kaic_nonce', 'nonce');
 
             if (!current_user_can('manage_options')) {
-                wp_send_json_error('Unauthorized');
+                wp_send_json_error(array('message' => __('Unauthorized user', 'kaic-image-compression')));
             }
 
             global $wpdb;
@@ -411,7 +424,7 @@ class KAIC_Image_Compression
                 wp_send_json_success(array('finished' => true));
             }
 
-            $attachment_id = $results[0]->ID;
+            $attachment_id = (int)$results[0]->ID;
             $original_size = $this->get_attachment_total_size($attachment_id);
             $thumb_url = wp_get_attachment_image_url($attachment_id, 'thumbnail');
             $filename = basename(get_attached_file($attachment_id) ?: "attachment_{$attachment_id}");
@@ -420,7 +433,7 @@ class KAIC_Image_Compression
                     'image' => array(
                             'id' => $attachment_id,
                             'filename' => $filename,
-                            'thumb' => $thumb_url,
+                            'thumb' => $thumb_url ? $thumb_url : '',
                             'original_size' => is_wp_error($original_size) ? 'Error' : size_format($original_size),
                     ),
                     'finished' => false
@@ -441,14 +454,14 @@ class KAIC_Image_Compression
             check_ajax_referer('kaic_nonce', 'nonce');
 
             if (!current_user_can('manage_options')) {
-                wp_send_json_error('Unauthorized');
+                wp_send_json_error(array('message' => __('Unauthorized user', 'kaic-image-compression')));
             }
 
-            $attachment_id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+            $attachment_id = isset($_POST['id']) ? absint($_POST['id']) : 0;
             if (!$attachment_id) {
                 $this->log_error('Invalid attachment ID provided in ajax_process_image.');
                 wp_send_json_error(array(
-                    'message' => 'Invalid ID',
+                    'message' => __('Invalid attachment ID', 'kaic-image-compression'),
                     'stats' => $this->get_stats()
                 ));
             }
