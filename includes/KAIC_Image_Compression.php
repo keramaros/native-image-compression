@@ -406,7 +406,7 @@ class KAIC_Image_Compression
             }
 
             $editor->set_quality($quality); // Reduce quality
-            $editor->save($file);
+            $this->save_editor_if_smaller($editor, $file);
         }
 
         // Also "compress" thumbnails
@@ -425,10 +425,56 @@ class KAIC_Image_Compression
                         }
 
                         $thumb_editor->set_quality($quality);
-                        $thumb_editor->save($thumb_path);
+                        $this->save_editor_if_smaller($thumb_editor, $thumb_path);
                     }
                 }
             }
+        }
+    }
+
+    private function save_editor_if_smaller($editor, $file)
+    {
+        $original_size = filesize($file);
+        if ($original_size === false) {
+            return;
+        }
+
+        $temp_file = tempnam(dirname($file), 'kaic-');
+        if ($temp_file === false) {
+            return;
+        }
+
+        $extension = pathinfo($file, PATHINFO_EXTENSION);
+        if ($extension !== '') {
+            $temp_file_with_extension = $temp_file . '.' . $extension;
+            if (!rename($temp_file, $temp_file_with_extension)) {
+                unlink($temp_file);
+                return;
+            }
+            $temp_file = $temp_file_with_extension;
+        }
+
+        $result = $editor->save($temp_file);
+        if (is_wp_error($result)) {
+            if (file_exists($temp_file)) {
+                unlink($temp_file);
+            }
+            return;
+        }
+
+        $compressed_file = isset($result['path']) ? $result['path'] : $temp_file;
+        if (file_exists($compressed_file)) {
+            $compressed_size = filesize($compressed_file);
+            if ($compressed_size !== false && $compressed_size < $original_size) {
+                copy($compressed_file, $file);
+            }
+        }
+
+        if (file_exists($compressed_file)) {
+            unlink($compressed_file);
+        }
+        if ($compressed_file !== $temp_file && file_exists($temp_file)) {
+            unlink($temp_file);
         }
     }
 }
