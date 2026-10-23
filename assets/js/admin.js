@@ -84,9 +84,12 @@ jQuery(document).ready(function ($) {
                                     }
                                 } else {
                                     // Handle internal error for this image
+                                    const errorMsg = (procResponse.data && procResponse.data.message) ?
+                                        procResponse.data.message :
+                                        (typeof procResponse.data === "string" ? procResponse.data : "Unknown error")
                                     updateRow({
                                         id: image.id,
-                                        error: procResponse.data || "Unknown error"
+                                        error: errorMsg
                                     })
 
                                     // Even on failure, we might have updated stats (like processed count)
@@ -99,10 +102,29 @@ jQuery(document).ready(function ($) {
                                     }
                                 }
                             },
-                            error: function () {
+                            error: function (xhr) {
+                                let errorMsg = "AJAX Error during processing"
+                                if (xhr.responseJSON && xhr.responseJSON.data) {
+                                    if (typeof xhr.responseJSON.data === "string") {
+                                        errorMsg = xhr.responseJSON.data
+                                    } else if (xhr.responseJSON.data.message) {
+                                        errorMsg = xhr.responseJSON.data.message
+                                    }
+                                } else if (xhr.responseText) {
+                                    try {
+                                        const parsed = JSON.parse(xhr.responseText)
+                                        if (parsed.data) {
+                                            if (typeof parsed.data === "string") {
+                                                errorMsg = parsed.data
+                                            } else if (parsed.data.message) {
+                                                errorMsg = parsed.data.message
+                                            }
+                                        }
+                                    } catch (e) {}
+                                }
                                 updateRow({
                                     id: image.id,
-                                    error: "AJAX Error during processing"
+                                    error: errorMsg
                                 })
                                 if (isProcessing) {
                                     setTimeout(processNext, 2000)
