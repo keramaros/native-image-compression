@@ -3,7 +3,7 @@
  * Plugin Name: Native Image Compression
  * Plugin URI: https://wordpress.org/plugins/native-image-compression/
  * Description: An image compression plugin that shrinks file sizes by automatically resizing dimensions and adjusting quality for faster web performance.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Keramaros Antonios
  * Author URI: https://keramaros.gr
  * License: GPLv2 or later
