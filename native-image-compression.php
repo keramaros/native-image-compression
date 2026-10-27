@@ -22,5 +22,18 @@ define('KAIC_PLUGIN_DIR_PATH', plugin_dir_path(__FILE__));
 define('KAIC_PLUGIN_DIR_URL', plugin_dir_url(__FILE__));
 
 require_once KAIC_PLUGIN_DIR_PATH . 'includes/KAIC_Image_Compression.php';
+require_once KAIC_PLUGIN_DIR_PATH . 'includes/GitHub_Updater.php';
+
+function run_my_github_updater()
+{
+    // Pass: (__FILE__, 'github-username', 'repository-name')
+    new GitHub_Updater(
+        __FILE__,
+        'keramaros',
+        'native-image-compression'
+    );
+}
+
+add_action('init', 'run_my_github_updater');
 
 new KAIC_Image_Compression();
