@@ -68,3 +68,35 @@
 
 #kaic-progress-log tr.error { background-color: #fcf0f1; }
 #kaic-progress-log .column-status .dashicons { font-size: 20px; width: 20px; height: 20px; }
+
+.kaic-danger-zone {
+    margin-top: 35px;
+    background: #fff;
+    border: 1px solid #d63638;
+    border-left: 4px solid #d63638;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+.kaic-danger-zone h2 {
+    color: #d63638;
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 1.3em;
+}
+.kaic-danger-zone p {
+    color: #50575e;
+}
+.kaic-danger-zone .button-danger {
+    background: #d63638;
+    border-color: #d63638;
+    color: #fff;
+    text-shadow: none;
+    font-weight: 500;
+}
+.kaic-danger-zone .button-danger:hover,
+.kaic-danger-zone .button-danger:focus {
+    background: #b32d2e;
+    border-color: #b32d2e;
+    color: #fff;
+}

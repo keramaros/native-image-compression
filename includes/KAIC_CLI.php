@@ -215,4 +215,38 @@ class KAIC_CLI
         WP_CLI::line(sprintf("Compressed Size: %s", $stats['compressed_size_formatted']));
         WP_CLI::line(sprintf("Total Saved: %s%%", $stats['total_saved_percent']));
     }
+
+    /**
+     * Clears all plugin settings, transients, and compression metadata from the database.
+     *
+     * ## OPTIONS
+     *
+     * [--yes]
+     * : Answer yes to the confirmation prompt.
+     *
+     * ## EXAMPLES
+     *
+     *     wp kaic clear-data --yes
+     *
+     * @subcommand clear-data
+     */
+    public function clear_data($args = array(), $assoc_args = array())
+    {
+        WP_CLI::confirm(__('Are you sure you want to clear all plugin data and compression metadata from the database?', 'native-image-compression'), $assoc_args);
+
+        $compression = KAIC_Image_Compression::get_instance();
+        $compression->clear_all_plugin_data();
+
+        WP_CLI::success(__('All plugin data and compression metadata have been cleared from the database.', 'native-image-compression'));
+    }
+
+    /**
+     * Alias for clear-data command.
+     *
+     * @subcommand reset
+     */
+    public function reset($args = array(), $assoc_args = array())
+    {
+        $this->clear_data($args, $assoc_args);
+    }
 }

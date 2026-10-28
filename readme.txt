@@ -13,13 +13,21 @@ Shrink image file sizes by automatically resizing dimensions and adjusting quali
 
 == Description ==
 
-Native Image Compression is an image optimization plugin for WordPress that helps you bulk compress images in your media library. It resizes oversized images to configured maximum dimensions and optimizes image quality using WordPress built-in image editors.
+Native Image Compression is a powerful, lightweight native image optimization plugin for WordPress that helps you bulk compress images in your media library. It resizes oversized images, optimizes compression quality, strips unnecessary metadata, quantizes color palettes, generates modern WebP images, and provides granular compression controls.
 
 Key Features:
-* Bulk compress all images in your media library.
-* Customizable maximum dimensions and image quality settings.
-* Live progress indicator with detailed compression statistics and savings.
+* Bulk compress all images in your media library with real-time stats and savings analytics.
+* Lossy and Lossless compression mode options.
+* Next-Gen WebP image generation with optional original fallback retention.
+* EXIF and metadata stripping with optional ICC color profile and copyright removal.
+* Granular dimensional scaling with customizable maximum width and height.
+* Thumbnail compression controls to selectively optimize registered image sizes.
+* Format-specific optimizations: PNG quantization (PNG-8), Progressive JPEG encoding, and 4:2:0 Chroma subsampling.
+* Automatic background compression upon uploading new media.
+* Backup pristine copies of original images before compression.
 * Error logging mechanism with log viewer and reset capabilities.
+* Danger Zone feature with one-click cleanup of all plugin data and metadata from the database.
+* Full WP-CLI support.
 
 == Installation ==
 
@@ -30,7 +38,7 @@ Key Features:
 == Frequently Asked Questions ==
 
 = Does this plugin modify original images? =
-The plugin resizes and optimizes image files in place if the compressed version is smaller than the original.
+The plugin resizes and optimizes image files in place if the compressed version is smaller than the original. Original files can be backed up automatically if the Backup Originals setting is enabled.
 
-= Can I choose the compression quality? =
-Yes, you can adjust the compression quality and maximum dimensions under **Settings > Native Image Compression**.
+= Can I choose the compression quality and mode? =
+Yes, you can select between Lossy and Lossless compression strategies and adjust quality levels under **Settings > Native Image Compression**.
