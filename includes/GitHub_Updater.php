@@ -18,6 +18,7 @@ class GitHub_Updater
 
         add_filter('site_transient_update_plugins', [$this, 'check_update']);
         add_filter('plugins_api', [$this, 'plugin_popup_handler'], 20, 3);
+        add_filter('upgrader_source_selection', [$this, 'upgrader_source_selection'], 10, 4);
     }
 
     public function check_update($transient)
@@ -56,6 +57,31 @@ class GitHub_Updater
         }
 
         return $transient;
+    }
+
+    /**
+     * Rename the uncompressed GitHub directory to match the actual plugin slug.
+     */
+    public function upgrader_source_selection($source, $remote_source, $upgrader, $hook_extra = null)
+    {
+        global $wp_filesystem;
+
+        // Ensure this hook only alters upgrades meant for this plugin
+        if (isset($hook_extra['plugin']) && $hook_extra['plugin'] === $this->basename) {
+            $proper_folder_name = dirname($this->basename);
+            if ('.' === $proper_folder_name || empty($proper_folder_name)) {
+                $proper_folder_name = $this->repository;
+            }
+
+            $new_source = trailingslashit($remote_source) . $proper_folder_name;
+
+            if (untrailingslashit($source) !== untrailingslashit($new_source)) {
+                $wp_filesystem->move($source, $new_source, true);
+                return trailingslashit($new_source);
+            }
+        }
+
+        return $source;
     }
 
     public function plugin_popup_handler($res, $action, $args)
