@@ -308,28 +308,46 @@ class KAIC_Image_Compression
     }
 
     /**
+     * Check if an attachment is an SVG image
+     *
+     * @param int|WP_Post $attachment
+     * @return bool
+     */
+    public function is_svg($attachment)
+    {
+        $attachment_id = is_object($attachment) ? $attachment->ID : absint($attachment);
+        if (!$attachment_id) {
+            return false;
+        }
+
+        $mime_type = get_post_mime_type($attachment_id);
+        if ($mime_type && stripos($mime_type, 'svg') !== false) {
+            return true;
+        }
+
+        $file = get_attached_file($attachment_id);
+        if ($file) {
+            $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            if ($extension === 'svg') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get Overall Stats
      */
     public function get_stats()
     {
         global $wpdb;
 
-        // Total attachments (Images)
-        $total_attachments = (int)$wpdb->get_var("SELECT COUNT(ID) FROM $wpdb->posts WHERE post_type = 'attachment' AND post_mime_type LIKE 'image/%'");
-
-        // Processed count
-        $processed_count = (int)$wpdb->get_var("SELECT COUNT(post_id) FROM $wpdb->postmeta WHERE meta_key = '_kaic_is_compressed' AND meta_value = '1'");
-
-        // Original size sum
-        $original_size = (float)$wpdb->get_var("SELECT SUM(meta_value) FROM $wpdb->postmeta WHERE meta_key = '_kaic_original_file_size'");
-
-        // For images not yet processed, we should count their current size as original for the stats?
-        // Actually, the requirement says \"Total original size of all images combined\".
-        // This is tricky if not all are processed yet. Let's calculate for all images.
-
         $total_original_size = 0;
         $total_compressed_size = 0;
         $total_files_count = 0;
+        $total_attachments = 0;
+        $processed_count = 0;
 
         $attachments = get_posts(array(
                 'post_type' => 'attachment',
@@ -339,9 +357,18 @@ class KAIC_Image_Compression
         ));
 
         foreach ($attachments as $id) {
+            if ($this->is_svg($id)) {
+                continue;
+            }
+
+            $total_attachments++;
             $is_compressed = get_post_meta($id, '_kaic_is_compressed', true);
             $orig = (float)get_post_meta($id, '_kaic_original_file_size', true);
             $opt = (float)get_post_meta($id, '_kaic_compressed_file_size', true);
+
+            if ($is_compressed) {
+                $processed_count++;
+            }
 
             $meta = wp_get_attachment_metadata($id);
             $count = 1; // Main file
@@ -430,22 +457,35 @@ class KAIC_Image_Compression
     public function get_next_image_id()
     {
         global $wpdb;
-        $results = $wpdb->get_results("
-			SELECT p.ID 
-			FROM $wpdb->posts p 
-			LEFT JOIN $wpdb->postmeta pm ON p.ID = pm.post_id AND pm.meta_key = '_kaic_is_compressed' 
-			WHERE p.post_type = 'attachment' 
-			AND p.post_mime_type LIKE 'image/%' 
-			AND (pm.meta_value IS NULL OR pm.meta_value = '0')
-			ORDER BY p.ID ASC
-			LIMIT 1
-		");
+        $offset = 0;
+        $limit = 20;
 
-        if (empty($results)) {
-            return null;
+        while (true) {
+            $results = $wpdb->get_results($wpdb->prepare("
+                SELECT p.ID 
+                FROM $wpdb->posts p 
+                LEFT JOIN $wpdb->postmeta pm ON p.ID = pm.post_id AND pm.meta_key = '_kaic_is_compressed' 
+                WHERE p.post_type = 'attachment' 
+                AND p.post_mime_type LIKE 'image/%' 
+                AND p.post_mime_type NOT LIKE 'image/svg%'
+                AND (pm.meta_value IS NULL OR pm.meta_value = '0')
+                ORDER BY p.ID ASC
+                LIMIT %d OFFSET %d
+            ", $limit, $offset));
+
+            if (empty($results)) {
+                return null;
+            }
+
+            foreach ($results as $row) {
+                $id = (int)$row->ID;
+                if (!$this->is_svg($id)) {
+                    return $id;
+                }
+            }
+
+            $offset += $limit;
         }
-
-        return (int)$results[0]->ID;
     }
 
     /**
@@ -490,6 +530,10 @@ class KAIC_Image_Compression
         if (!$attachment_id) {
             $this->log_error('Invalid attachment ID provided in process_image.');
             return new WP_Error('invalid_attachment_id', __('Invalid attachment ID', 'native-image-compression'));
+        }
+
+        if ($this->is_svg($attachment_id)) {
+            return new WP_Error('svg_skipped', __('SVG images are skipped as they cannot be compressed.', 'native-image-compression'));
         }
 
         // 1. Save original size
@@ -660,6 +704,10 @@ class KAIC_Image_Compression
      */
     public function simulate_media_compression($attachment_id)
     {
+        if ($this->is_svg($attachment_id)) {
+            return new WP_Error('svg_skipped', __('SVG images are skipped as they cannot be compressed.', 'native-image-compression'));
+        }
+
         // In a real scenario, we'd use WP_Image_Editor here.
         // For simulation, we'll just simulate the fact that it was "processed".
         // To make it more realistic, we could actually re-save the image with lower quality.
