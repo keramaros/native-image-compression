@@ -43,6 +43,25 @@ Navigate to **Media > Bulk Compression**:
 - View real-time progress, processed images count, and total space saved.
 - Check the error log tab if any individual image fails to process.
 
+### WP-CLI Commands
+Optimize images directly from the command line:
+```bash
+# Bulk compress all uncompressed images and view real-time logs
+wp kaic compress
+
+# Compress next 10 uncompressed images
+wp kaic compress --limit=10
+
+# Get next uncompressed image info
+wp kaic get-next-image
+
+# Compress a specific image by attachment ID
+wp kaic process-image 123
+
+# Display overall compression statistics
+wp kaic stats
+```
+
 ---
 
 ## Frequently Asked Questions

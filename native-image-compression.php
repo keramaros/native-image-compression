@@ -3,7 +3,7 @@
  * Plugin Name: Native Image Compression
  * Plugin URI: https://wordpress.org/plugins/native-image-compression/
  * Description: An image compression plugin that shrinks file sizes by automatically resizing dimensions and adjusting quality for faster web performance.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Keramaros Antonios
  * Author URI: https://keramaros.gr
  * License: GPLv2 or later
@@ -37,3 +37,9 @@ function run_my_github_updater()
 add_action('init', 'run_my_github_updater');
 
 new KAIC_Image_Compression();
+
+if (defined('WP_CLI') && WP_CLI) {
+    require_once KAIC_PLUGIN_DIR_PATH . 'includes/KAIC_CLI.php';
+    WP_CLI::add_command('kaic', 'KAIC_CLI');
+    WP_CLI::add_command('native-image-compression', 'KAIC_CLI');
+}

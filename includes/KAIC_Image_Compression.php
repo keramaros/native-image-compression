@@ -6,8 +6,30 @@ if (!defined('ABSPATH')) {
 
 class KAIC_Image_Compression
 {
+    /**
+     * Singleton instance
+     *
+     * @var KAIC_Image_Compression|null
+     */
+    private static $instance = null;
+
+    /**
+     * Get singleton instance
+     *
+     * @return KAIC_Image_Compression
+     */
+    public static function get_instance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
     public function __construct()
     {
+        self::$instance = $this;
+
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'register_settings'));
         add_action('admin_init', array($this, 'handle_activation_redirect'));
@@ -191,8 +213,8 @@ class KAIC_Image_Compression
             return;
         }
 
-        wp_enqueue_style('kaic-admin-css', KAIC_PLUGIN_DIR_URL . 'assets/css/admin.css', array('dashicons'), '1.0.2');
-        wp_enqueue_script('kaic-admin-js', KAIC_PLUGIN_DIR_URL . 'assets/js/admin.js', array('jquery'), '1.0.2', true);
+        wp_enqueue_style('kaic-admin-css', KAIC_PLUGIN_DIR_URL . 'assets/css/admin.css', array('dashicons'), '1.0.3');
+        wp_enqueue_script('kaic-admin-js', KAIC_PLUGIN_DIR_URL . 'assets/js/admin.js', array('jquery'), '1.0.3', true);
 
         wp_localize_script('kaic-admin-js', 'kaic_vars', array(
                 'nonce' => wp_create_nonce('kaic_nonce')
@@ -288,7 +310,7 @@ class KAIC_Image_Compression
     /**
      * Get Overall Stats
      */
-    private function get_stats()
+    public function get_stats()
     {
         global $wpdb;
 
@@ -359,7 +381,7 @@ class KAIC_Image_Compression
      *
      * @return int|WP_Error
      */
-    private function get_attachment_total_size($attachment_id)
+    public function get_attachment_total_size($attachment_id)
     {
         $file = get_attached_file($attachment_id);
 
@@ -401,6 +423,137 @@ class KAIC_Image_Compression
     }
 
     /**
+     * Get next uncompressed image ID
+     *
+     * @return int|null
+     */
+    public function get_next_image_id()
+    {
+        global $wpdb;
+        $results = $wpdb->get_results("
+			SELECT p.ID 
+			FROM $wpdb->posts p 
+			LEFT JOIN $wpdb->postmeta pm ON p.ID = pm.post_id AND pm.meta_key = '_kaic_is_compressed' 
+			WHERE p.post_type = 'attachment' 
+			AND p.post_mime_type LIKE 'image/%' 
+			AND (pm.meta_value IS NULL OR pm.meta_value = '0')
+			ORDER BY p.ID ASC
+			LIMIT 1
+		");
+
+        if (empty($results)) {
+            return null;
+        }
+
+        return (int)$results[0]->ID;
+    }
+
+    /**
+     * Get next uncompressed image details
+     *
+     * @return array
+     */
+    public function get_next_image_data()
+    {
+        $attachment_id = $this->get_next_image_id();
+        if (!$attachment_id) {
+            return array('finished' => true);
+        }
+
+        $original_size = $this->get_attachment_total_size($attachment_id);
+        $thumb_url = wp_get_attachment_image_url($attachment_id, 'thumbnail');
+        $image_url = wp_get_attachment_url($attachment_id);
+        $filename = basename(get_attached_file($attachment_id) ?: "attachment_{$attachment_id}");
+
+        return array(
+            'finished' => false,
+            'image' => array(
+                'id' => $attachment_id,
+                'filename' => $filename,
+                'thumb' => $thumb_url ? $thumb_url : '',
+                'url' => $image_url ? $image_url : '',
+                'original_size' => is_wp_error($original_size) ? 'Error' : size_format($original_size),
+                'original_size_bytes' => is_wp_error($original_size) ? 0 : (int)$original_size,
+            ),
+        );
+    }
+
+    /**
+     * Process / Compress specific attachment image
+     *
+     * @param int $attachment_id
+     * @return array|WP_Error
+     */
+    public function process_image($attachment_id)
+    {
+        $attachment_id = absint($attachment_id);
+        if (!$attachment_id) {
+            $this->log_error('Invalid attachment ID provided in process_image.');
+            return new WP_Error('invalid_attachment_id', __('Invalid attachment ID', 'native-image-compression'));
+        }
+
+        // 1. Save original size
+        $original_size = $this->get_attachment_total_size($attachment_id);
+        $error = null;
+
+        if (is_wp_error($original_size)) {
+            $error = $original_size->get_error_message();
+        } else {
+            update_post_meta($attachment_id, '_kaic_original_file_size', (int)$original_size);
+
+            // 2. Simulate Compression
+            $result = $this->simulate_media_compression($attachment_id);
+            if (is_wp_error($result)) {
+                $error = $result->get_error_message();
+            } else {
+                // 3. Save compressed size
+                $compressed_size = $this->get_attachment_total_size($attachment_id);
+                if (is_wp_error($compressed_size)) {
+                    $error = $compressed_size->get_error_message();
+                } else {
+                    update_post_meta($attachment_id, '_kaic_compressed_file_size', (int)$compressed_size);
+                }
+            }
+        }
+
+        // Always mark as compressed (or failed) to prevent infinite loops
+        update_post_meta($attachment_id, '_kaic_is_compressed', '1');
+        if ($error) {
+            update_post_meta($attachment_id, '_kaic_compression_error', $error);
+            $filename = basename(get_attached_file($attachment_id) ?: "attachment_{$attachment_id}");
+            $this->log_error(sprintf('Error processing attachment ID %d (%s): %s', $attachment_id, $filename, $error));
+        }
+
+        $orig_size_num = is_wp_error($original_size) ? 0 : (int)$original_size;
+        $comp_size_num = (isset($compressed_size) && !is_wp_error($compressed_size)) ? (int)$compressed_size : $orig_size_num;
+        $optimized_size_display = $comp_size_num > 0 ? size_format($comp_size_num) : '-';
+        $saved_percent = ($orig_size_num > 0 && $orig_size_num >= $comp_size_num) ? round((($orig_size_num - $comp_size_num) / $orig_size_num) * 100, 2) : 0;
+        $saved_bytes = ($orig_size_num > 0 && $orig_size_num >= $comp_size_num) ? ($orig_size_num - $comp_size_num) : 0;
+
+        $image_url = wp_get_attachment_url($attachment_id);
+        if (empty($image_url)) {
+            $attached_file = get_attached_file($attachment_id);
+            $image_url = $attached_file ? $attached_file : "attachment_{$attachment_id}";
+        }
+
+        return array(
+            'id' => $attachment_id,
+            'url' => $image_url,
+            'initial_size' => $orig_size_num > 0 ? size_format($orig_size_num) : 'Error',
+            'initial_size_bytes' => $orig_size_num,
+            'compressed' => $optimized_size_display,
+            'compressed_bytes' => $comp_size_num,
+            'savings' => $saved_percent . '%',
+            'savings_percent' => $saved_percent,
+            'savings_bytes' => $saved_bytes,
+            'savings_formatted' => $saved_bytes > 0 ? size_format($saved_bytes) . " ({$saved_percent}%)" : '0%',
+            'optimized_size' => $optimized_size_display,
+            'saved_percent' => $saved_percent,
+            'error' => $error,
+        );
+    }
+
+    /**
      * AJAX Handler: Get next image data without processing
      */
     public function ajax_get_next_image()
@@ -412,35 +565,19 @@ class KAIC_Image_Compression
                 wp_send_json_error(array('message' => __('Unauthorized user', 'native-image-compression')));
             }
 
-            global $wpdb;
-            $results = $wpdb->get_results("
-			SELECT p.ID 
-			FROM $wpdb->posts p 
-			LEFT JOIN $wpdb->postmeta pm ON p.ID = pm.post_id AND pm.meta_key = '_kaic_is_compressed' 
-			WHERE p.post_type = 'attachment' 
-			AND p.post_mime_type LIKE 'image/%' 
-			AND (pm.meta_value IS NULL OR pm.meta_value = '0')
-			ORDER BY p.ID ASC
-			LIMIT 1
-		");
-
-            if (empty($results)) {
+            $data = $this->get_next_image_data();
+            if (isset($data['finished']) && $data['finished']) {
                 wp_send_json_success(array('finished' => true));
             }
 
-            $attachment_id = (int)$results[0]->ID;
-            $original_size = $this->get_attachment_total_size($attachment_id);
-            $thumb_url = wp_get_attachment_image_url($attachment_id, 'thumbnail');
-            $filename = basename(get_attached_file($attachment_id) ?: "attachment_{$attachment_id}");
-
             wp_send_json_success(array(
-                    'image' => array(
-                            'id' => $attachment_id,
-                            'filename' => $filename,
-                            'thumb' => $thumb_url ? $thumb_url : '',
-                            'original_size' => is_wp_error($original_size) ? 'Error' : size_format($original_size),
-                    ),
-                    'finished' => false
+                'image' => array(
+                    'id' => $data['image']['id'],
+                    'filename' => $data['image']['filename'],
+                    'thumb' => $data['image']['thumb'],
+                    'original_size' => $data['image']['original_size'],
+                ),
+                'finished' => false,
             ));
         } catch (\Throwable $e) {
             $this->log_error(sprintf('Error in ajax_get_next_image: %s in %s on line %d', $e->getMessage(), $e->getFile(), $e->getLine()));
@@ -470,51 +607,28 @@ class KAIC_Image_Compression
                 ));
             }
 
-            // 1. Save original size
-            $original_size = $this->get_attachment_total_size($attachment_id);
-            $error = null;
-
-            if (is_wp_error($original_size)) {
-                $error = $original_size->get_error_message();
-            } else {
-                update_post_meta($attachment_id, '_kaic_original_file_size', (int)$original_size);
-
-                // 2. Simulate Compression
-                $result = $this->simulate_media_compression($attachment_id);
-                if (is_wp_error($result)) {
-                    $error = $result->get_error_message();
-                } else {
-                    // 3. Save compressed size
-                    $compressed_size = $this->get_attachment_total_size($attachment_id);
-                    if (is_wp_error($compressed_size)) {
-                        $error = $compressed_size->get_error_message();
-                    } else {
-                        update_post_meta($attachment_id, '_kaic_compressed_file_size', (int)$compressed_size);
-                    }
-                }
-            }
-
-            // Always mark as compressed (or failed) to prevent infinite loops
-            update_post_meta($attachment_id, '_kaic_is_compressed', '1');
-            if ($error) {
-                update_post_meta($attachment_id, '_kaic_compression_error', $error);
-                $filename = basename(get_attached_file($attachment_id) ?: "attachment_{$attachment_id}");
-                $this->log_error(sprintf('Error processing attachment ID %d (%s): %s', $attachment_id, $filename, $error));
-            }
-
-            $orig_size_num = is_wp_error($original_size) ? 0 : (int)$original_size;
-            $comp_size_num = (isset($compressed_size) && !is_wp_error($compressed_size)) ? (int)$compressed_size : $orig_size_num;
-            $optimized_size_display = $comp_size_num > 0 ? size_format($comp_size_num) : '-';
-            $saved_percent = ($orig_size_num > 0 && $orig_size_num >= $comp_size_num) ? round((($orig_size_num - $comp_size_num) / $orig_size_num) * 100, 2) : 0;
-
-            wp_send_json_success(array(
+            $result = $this->process_image($attachment_id);
+            if (is_wp_error($result)) {
+                wp_send_json_error(array(
+                    'message' => $result->get_error_message(),
                     'stats' => $this->get_stats(),
                     'image' => array(
-                            'id' => $attachment_id,
-                            'optimized_size' => $optimized_size_display,
-                            'saved_percent' => $saved_percent,
-                            'error' => $error
+                        'id' => $attachment_id,
+                        'optimized_size' => '-',
+                        'saved_percent' => 0,
+                        'error' => $result->get_error_message(),
                     )
+                ));
+            }
+
+            wp_send_json_success(array(
+                'stats' => $this->get_stats(),
+                'image' => array(
+                    'id' => $attachment_id,
+                    'optimized_size' => $result['optimized_size'],
+                    'saved_percent' => $result['saved_percent'],
+                    'error' => $result['error'],
+                )
             ));
         } catch (\Throwable $e) {
             $filename = $attachment_id ? basename(get_attached_file($attachment_id) ?: "attachment_{$attachment_id}") : 'unknown';
@@ -544,7 +658,7 @@ class KAIC_Image_Compression
      * Simulates reduction by 10-30% using standard WP image editors if possible,
      * or just meta tracking for simulation purposes.
      */
-    private function simulate_media_compression($attachment_id)
+    public function simulate_media_compression($attachment_id)
     {
         // In a real scenario, we'd use WP_Image_Editor here.
         // For simulation, we'll just simulate the fact that it was "processed".
@@ -621,7 +735,7 @@ class KAIC_Image_Compression
         return true;
     }
 
-    private function save_editor_if_smaller($editor, $file)
+    public function save_editor_if_smaller($editor, $file)
     {
         $original_size = filesize($file);
         if ($original_size === false) {
