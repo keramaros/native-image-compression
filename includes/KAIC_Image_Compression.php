@@ -260,7 +260,7 @@ class KAIC_Image_Compression
         ));
         register_setting('kaic_settings_group', 'kaic_quality', array(
                 'type' => 'integer',
-                'sanitize_callback' => 'absint',
+                'sanitize_callback' => array($this, 'sanitize_quality'),
                 'default' => 70,
         ));
 
@@ -296,17 +296,12 @@ class KAIC_Image_Compression
         ));
         register_setting('kaic_settings_group', 'kaic_max_width', array(
                 'type' => 'integer',
-                'sanitize_callback' => 'absint',
+                'sanitize_callback' => array($this, 'sanitize_dimension'),
                 'default' => 2048,
         ));
         register_setting('kaic_settings_group', 'kaic_max_height', array(
                 'type' => 'integer',
-                'sanitize_callback' => 'absint',
-                'default' => 2048,
-        ));
-        register_setting('kaic_settings_group', 'kaic_max_dimension', array(
-                'type' => 'integer',
-                'sanitize_callback' => 'absint',
+                'sanitize_callback' => array($this, 'sanitize_dimension'),
                 'default' => 2048,
         ));
         register_setting('kaic_settings_group', 'kaic_compressed_sizes', array(
@@ -355,6 +350,30 @@ class KAIC_Image_Compression
     {
         $value = sanitize_text_field($value);
         return in_array($value, array('lossy', 'lossless'), true) ? $value : 'lossy';
+    }
+
+    /**
+     * Sanitize quality level setting
+     *
+     * @param mixed $value
+     * @return int
+     */
+    public function sanitize_quality($value)
+    {
+        $value = absint($value);
+        return ($value >= 1 && $value <= 100) ? $value : 70;
+    }
+
+    /**
+     * Sanitize max width / height dimension setting
+     *
+     * @param mixed $value
+     * @return int
+     */
+    public function sanitize_dimension($value)
+    {
+        $value = absint($value);
+        return ($value > 0) ? $value : 2048;
     }
 
     /**
@@ -525,8 +544,16 @@ class KAIC_Image_Compression
         $remove_icc_profile = get_option('kaic_remove_icc_profile', 0);
 
         $enable_resize = get_option('kaic_enable_resize', 1);
-        $max_width = get_option('kaic_max_width', get_option('kaic_max_dimension', 2048));
-        $max_height = get_option('kaic_max_height', get_option('kaic_max_dimension', 2048));
+        $legacy_dimension = (int)get_option('kaic_max_dimension', 2048);
+        $legacy_default = ($legacy_dimension > 0) ? $legacy_dimension : 2048;
+        $max_width = (int)get_option('kaic_max_width', $legacy_default);
+        if ($max_width <= 0) {
+            $max_width = $legacy_default;
+        }
+        $max_height = (int)get_option('kaic_max_height', $legacy_default);
+        if ($max_height <= 0) {
+            $max_height = $legacy_default;
+        }
         $available_sizes = function_exists('get_intermediate_image_sizes') ? get_intermediate_image_sizes() : array('thumbnail', 'medium', 'medium_large', 'large');
         $compressed_sizes = get_option('kaic_compressed_sizes', null);
         if ($compressed_sizes === null) {
@@ -656,14 +683,14 @@ class KAIC_Image_Compression
                     <tr valign="top">
                         <th scope="row"><?php esc_html_e('Maximum Width', 'native-image-compression'); ?></th>
                         <td>
-                            <input type="number" name="kaic_max_width" value="<?php echo esc_attr($max_width); ?>" class="regular-text"/> px
+                            <input type="number" name="kaic_max_width" value="<?php echo esc_attr($max_width); ?>" min="1" class="regular-text"/> px
                             <p class="description"><?php esc_html_e('The maximum allowed width in pixels for compressed images. Images wider than this will be proportionally downscaled.', 'native-image-compression'); ?></p>
                         </td>
                     </tr>
                     <tr valign="top">
                         <th scope="row"><?php esc_html_e('Maximum Height', 'native-image-compression'); ?></th>
                         <td>
-                            <input type="number" name="kaic_max_height" value="<?php echo esc_attr($max_height); ?>" class="regular-text"/> px
+                            <input type="number" name="kaic_max_height" value="<?php echo esc_attr($max_height); ?>" min="1" class="regular-text"/> px
                             <p class="description"><?php esc_html_e('The maximum allowed height in pixels for compressed images. Images taller than this will be proportionally downscaled.', 'native-image-compression'); ?></p>
                         </td>
                     </tr>
@@ -1224,8 +1251,10 @@ class KAIC_Image_Compression
         $mode = get_option('kaic_compression_mode', 'lossy');
         $quality = ($mode === 'lossless') ? 100 : (int)get_option('kaic_quality', 70);
         $enable_resize = (bool)get_option('kaic_enable_resize', 1);
-        $max_width = (int)get_option('kaic_max_width', get_option('kaic_max_dimension', 2048));
-        $max_height = (int)get_option('kaic_max_height', get_option('kaic_max_dimension', 2048));
+        $legacy_dimension = (int)get_option('kaic_max_dimension', 2048);
+        $legacy_default = ($legacy_dimension > 0) ? $legacy_dimension : 2048;
+        $max_width = (int)get_option('kaic_max_width', $legacy_default);
+        $max_height = (int)get_option('kaic_max_height', $legacy_default);
         if ($max_width <= 0) {
             $max_width = 2048;
         }
