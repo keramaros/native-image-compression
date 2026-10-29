@@ -497,10 +497,10 @@ class KAIC_Image_Compression
             return;
         }
 
-        wp_enqueue_style('kaic-admin-css', KAIC_PLUGIN_DIR_URL . 'assets/css/admin.css', array('dashicons'), '1.0.7');
+        wp_enqueue_style('kaic-admin-css', KAIC_PLUGIN_DIR_URL . 'assets/css/admin.css', array('dashicons'), '1.0.8');
 
         if ('media_page_native-image-compression-bulk' === $hook) {
-            wp_enqueue_script('kaic-admin-js', KAIC_PLUGIN_DIR_URL . 'assets/js/admin.js', array('jquery'), '1.0.7', true);
+            wp_enqueue_script('kaic-admin-js', KAIC_PLUGIN_DIR_URL . 'assets/js/admin.js', array('jquery'), '1.0.8', true);
 
             wp_localize_script('kaic-admin-js', 'kaic_vars', array(
                     'nonce' => wp_create_nonce('kaic_nonce')
